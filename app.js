@@ -6,7 +6,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Замените этими значениями настройки своего webhook-получателя
-const webhookReceiverUrl = 'https://cloud.roistat.com/integration/webhook?key=eb40c961ee2b6f9af08f935b26d9607a';
+const webhookReceiverUrl = process.env.WEBHOOK_RECEIVER_URL;
 
 function transformData(data) {
     const transformedData = {
