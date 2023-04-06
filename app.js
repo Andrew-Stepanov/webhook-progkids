@@ -1,10 +1,11 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const axios = require('axios');
+const sendgrid = require('./sendgrid');
 require('dotenv').config();
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Замените этими значениями настройки своего webhook-получателя
 const webhookReceiverUrl = process.env.WEBHOOK_RECEIVER_URL;
@@ -43,7 +44,33 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+// Добавьте новый маршрут для добавления контакта в SendGrid
+app.post('/sendgrid-add', async (req, res) => {
+    const receivedData = req.body;
+    console.log('Received webhook data:', receivedData);
+
+    // Извлеките нужные данные из вебхука
+    const email = receivedData.email;
+    const firstName = receivedData.name;
+    const lastName = ''; // Если в вебхуке есть фамилия, замените этим значением
+
+    if (!email || !firstName) {
+        res.status(400).send({ error: 'Email and firstName are required' });
+        return;
+    }
+
+    try {
+        // Добавьте контакт в глобальный список контактов
+        await sendgrid.addContactToList(email, firstName, lastName);
+        res.status(200).send({ message: 'Contact added successfully' });
+    } catch (error) {
+        console.error('Error adding contact:', error.message);
+        res.status(500).send({ error: 'Error adding contact' });
+    }
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Webhook server listening on port ${port}`);
+  sendgrid.sendTestEmail();
 });
