@@ -8,9 +8,9 @@ function sendTestEmail() {
     const msg = {
       to: 'andrewstepanov@icloud.com', // Адрес получателя
       from: 'lessons@progkids.com', // Адрес отправителя, на котором зарегистрирован SendGrid
-      subject: 'Test Email',
-      text: 'This is a test email from SendGrid',
-      html: '<p>This is a test email from SendGrid</p>',
+      subject: 'Webhook service',
+      text: 'Server is online',
+      html: '<p>Server is online</p>',
     };
     
     sendgrid.send(msg)
@@ -21,7 +21,8 @@ function sendTestEmail() {
         console.error('Error sending test email:', error);
       });
   }
-async function addContactToList(email, firstName, lastName) {
+
+async function addContactToList(email, firstName = null, lastName = null, listId = null) {
     const url = `https://api.sendgrid.com/v3/marketing/contacts`;
   
     const data = {
@@ -32,7 +33,12 @@ async function addContactToList(email, firstName, lastName) {
           last_name: lastName,
         },
       ],
+      list_ids: listId ? [listId] : [],
     };
+
+    if (listId) {
+      data.list_ids = [listId];
+    }
   
     const headers = {
       Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
@@ -42,9 +48,11 @@ async function addContactToList(email, firstName, lastName) {
     try {
       const response = await axios.put(url, data, { headers: headers });
       console.log('Contact added:', email);
+
     } catch (error) {
       console.error('Error adding contact:', error.message);
     }
+    
   }
   
   module.exports = {

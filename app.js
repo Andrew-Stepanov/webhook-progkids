@@ -52,7 +52,8 @@ app.post('/sendgrid-add', async (req, res) => {
     // Извлеките нужные данные из вебхука
     const email = receivedData.email;
     const firstName = receivedData.name;
-    const lastName = ''; // Если в вебхуке есть фамилия, замените этим значением
+    const lastName = '';
+    const listId = receivedData.listId; // Если в вебхуке есть фамилия, замените этим значением
 
     if (!email || !firstName) {
         res.status(400).send({ error: 'Email and firstName are required' });
@@ -61,7 +62,7 @@ app.post('/sendgrid-add', async (req, res) => {
 
     try {
         // Добавьте контакт в глобальный список контактов
-        await sendgrid.addContactToList(email, firstName, lastName);
+        await sendgrid.addContactToList(email, firstName, lastName, listId);
         res.status(200).send({ message: 'Contact added successfully' });
     } catch (error) {
         console.error('Error adding contact:', error.message);
