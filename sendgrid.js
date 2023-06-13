@@ -35,10 +35,6 @@ async function addContactToList(email, firstName = null, lastName = null, listId
       ],
       list_ids: listId ? [listId] : [],
     };
-
-    if (listId) {
-      data.list_ids = [listId];
-    }
   
     const headers = {
       Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
