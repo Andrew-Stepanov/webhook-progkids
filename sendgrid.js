@@ -31,7 +31,7 @@ async function addContactToList(email, firstName = null, lastName = null, listId
           email: email,
           first_name: firstName,
           last_name: lastName,
-          "custom_fields": {
+          custom_fields: {
               "trialCompleted": trialCompleted,
               "paid": paid,
           }
