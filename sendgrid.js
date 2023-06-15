@@ -22,7 +22,7 @@ function sendTestEmail() {
       });
   }
 
-async function addContactToList(email, firstName = null, lastName = null, listId = null, trialCompleted = null, paid = null) {
+async function addContactToList(email, firstName = null, lastName = null, listId = null, trialScheduled = null, trialCompleted = null) {
     const url = `https://api.sendgrid.com/v3/marketing/contacts`;
   
     const data = {
@@ -32,8 +32,8 @@ async function addContactToList(email, firstName = null, lastName = null, listId
           first_name: firstName,
           last_name: lastName,
           custom_fields: {
-              'e7_N': trialCompleted,
-              'e6_N': paid,
+              e6_N: Number(trialScheduled),
+              e7_N: Number(trialCompleted),
           }
         },
       ],
