@@ -17,7 +17,7 @@ function transformData(data) {
       name: data.data.name,
       email: data.data.email,
       phone: data.data.phone,
-      comment: 'Комментарий проксилида', // Замените на нужное значение или сформируйте из входящих данных
+      comment: data.data.page_url, // Замените на нужное значение или сформируйте из входящих данных
       roistat_visit: data.data.roistat_visit,
       fields: {
         site: data.site, // Замените на нужное значение или сформируйте из входящих данных
@@ -56,6 +56,7 @@ app.post('/sendgrid-add', async (req, res) => {
     const listId = receivedData.listId;
     const trialScheduled = receivedData.trialScheduled;
     const trialCompleted = receivedData.trialCompleted;
+    const paid = receivedData.paid;
 
     if (!email || !firstName) {
         res.status(400).send({ error: 'Email and firstName are required' });
@@ -64,7 +65,7 @@ app.post('/sendgrid-add', async (req, res) => {
 
     try {
         // Добавьте контакт в глобальный список контактов
-        await sendgrid.addContactToList(email, firstName, lastName, listId, trialScheduled, trialCompleted);
+        await sendgrid.addContactToList(email, firstName, lastName, listId, trialScheduled, trialCompleted, paid);
         res.status(200).send({ message: 'Contact added successfully' });
     } catch (error) {
         console.error('Error adding contact:', error.message);
