@@ -28,9 +28,18 @@ function transformData(data) {
     return transformedData;
   }  
 
+const excludedFormIds = ['doNotSendForm', 'doNotSendForm-1'];
+
 app.post('/webhook', async (req, res) => {
   const receivedData = req.body;
   console.log('Received webhook data:', receivedData);
+
+  // Если ID формы находится в списке исключений, пропустите обработку
+  if (excludedFormIds.includes(receivedData.formId)) {
+    console.log('Skipping processing for form ID:', receivedData.formId);
+    res.sendStatus(200);
+    return;
+  }
 
   const transformedData = transformData(receivedData);
 
