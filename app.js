@@ -65,7 +65,7 @@ app.post('/sendgrid-add', async (req, res) => {
     const listId = receivedData.listId;
     const trialScheduled = receivedData.trialScheduled;
     const trialCompleted = receivedData.trialCompleted;
-    const paid = receivedData.paid;
+    const paid = receivedData.paid || '0';
 
     if (!email || !firstName) {
         res.status(400).send({ error: 'Email and firstName are required' });

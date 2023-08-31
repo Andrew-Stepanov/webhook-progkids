@@ -49,9 +49,9 @@ async function addContactToList(email, firstName = null, lastName = null, listId
     try {
       const response = await axios.put(url, data, { headers: headers });
       console.log('Contact added:', email);
-
     } catch (error) {
-      console.error('Error adding contact:', error.message);
+      console.error('Error adding contact:', error.response ? error.response.data : error.message);
+      throw error;
     }
     
   }
