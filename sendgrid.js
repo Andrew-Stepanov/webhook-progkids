@@ -22,8 +22,32 @@ function sendTestEmail() {
       });
   }
 
+async function getContactByEmail(email) {
+  const url = `https://api.sendgrid.com/v3/marketing/contacts/search`;
+  const data = {
+      query: `email = '${email}'`
+  };
+  const headers = {
+      Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
+      'Content-Type': 'application/json',
+  };
+  
+  try {
+      const response = await axios.post(url, data, { headers: headers });
+      return response.data.result[0];  // предполагается, что email уникален
+  } catch (error) {
+      console.error('Error fetching contact:', error.message);
+      throw error;
+  }
+}
+
 async function addContactToList(email, firstName = null, lastName = null, listId = null, trialScheduled = null, trialCompleted = null, paid) {
     const url = `https://api.sendgrid.com/v3/marketing/contacts`;
+    const currentContact = await getContactByEmail(email);
+
+    const e6_N = currentContact && currentContact.custom_fields.trialScheduled === 1 ? 1 : Number(trialScheduled);
+    const e7_N = currentContact && currentContact.custom_fields.trialCompleted === 1 ? 1 : Number(trialCompleted);
+    const e10_N = currentContact && currentContact.custom_fields.paid === 1 ? 1 : Number(paid);
   
     const data = {
       contacts: [
@@ -32,9 +56,9 @@ async function addContactToList(email, firstName = null, lastName = null, listId
           first_name: firstName,
           last_name: lastName,
           custom_fields: {
-              e6_N: Number(trialScheduled),
-              e7_N: Number(trialCompleted),
-              e10_N: Number(paid),
+              e6_N: e6_N,
+              e7_N: e7_N,
+              e10_N: e10_N,
           }
         },
       ],
