@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const sendgrid = require('./sendgrid');
+const typeform = require('./typeform');
 require('dotenv').config();
 
 const app = express();
@@ -9,7 +10,6 @@ app.use(express.json());
 
 // Замените этими значениями настройки своего webhook-получателя
 const webhookReceiverUrl = process.env.WEBHOOK_RECEIVER_URL;
-//const webhookReceiverUrl = 'https://cloud.roistat.com/integration/webhook?key=eb40c961ee2b6f9af08f935b26d9607a';
 
 function transformData(data) {
     const transformedData = {
@@ -67,8 +67,8 @@ app.post('/sendgrid-add', async (req, res) => {
     const trialCompleted = receivedData.trialCompleted;
     const paid = receivedData.paid || '0';
 
-    if (!email || !firstName) {
-        res.status(400).send({ error: 'Email and firstName are required' });
+    if (!email) {
+        res.status(400).send({ error: 'Email are required' });
         return;
     }
 
@@ -82,8 +82,18 @@ app.post('/sendgrid-add', async (req, res) => {
     }
 });
 
+app.post('/typeform-webhook', async (req, res) => {
+  const receivedData = req.body;
+  console.log('Received Typeform webhook data:', receivedData);
+
+  const extractedData = typeform.extractTypeFormData(receivedData);
+  await typeform.addToWebflowCMS(extractedData);
+
+  res.sendStatus(200);
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Webhook server listening on port ${port}`);
-  sendgrid.sendTestEmail();
+//  sendgrid.sendTestEmail();
 });
