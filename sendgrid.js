@@ -45,6 +45,10 @@ async function addContactToList(email, firstName = null, lastName = null, listId
     const url = `https://api.sendgrid.com/v3/marketing/contacts`;
     const currentContact = await getContactByEmail(email);
 
+    // Использование существующих данных имени и фамилии, если они доступны
+    firstName = currentContact?.first_name ?? firstName;
+    lastName = currentContact?.last_name ?? lastName;
+
     const e6_N = currentContact && currentContact.custom_fields.trialScheduled === 1 ? 1 : Number(trialScheduled);
     const e7_N = currentContact && currentContact.custom_fields.trialCompleted === 1 ? 1 : Number(trialCompleted);
     const e10_N = currentContact && currentContact.custom_fields.paid === 1 ? 1 : Number(paid) || 0;

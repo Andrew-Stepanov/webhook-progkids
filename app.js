@@ -52,6 +52,7 @@ app.post("/webhook", async (req, res) => {
         "f6ea749f-36c4-42e9-a2fb-1fde740cd3df"
       );
       console.log("Email added to SendGrid:", email);
+      return;
     } catch (error) {
       console.error("Error adding email to SendGrid:", error.message);
       res.sendStatus(500);
