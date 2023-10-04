@@ -28,7 +28,7 @@ function transformData(data) {
     return transformedData;
   }  
 
-const excludedFormName = ['doNotSendForm', 'doNotSendForm-1'];
+const excludedFormName = ['doNotSendForm', 'doNotSendForm-1','subscribe'];
 
 app.post('/webhook', async (req, res) => {
   const receivedData = req.body;
