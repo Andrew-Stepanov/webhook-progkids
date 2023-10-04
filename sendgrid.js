@@ -47,7 +47,7 @@ async function addContactToList(email, firstName = null, lastName = null, listId
 
     const e6_N = currentContact && currentContact.custom_fields.trialScheduled === 1 ? 1 : Number(trialScheduled);
     const e7_N = currentContact && currentContact.custom_fields.trialCompleted === 1 ? 1 : Number(trialCompleted);
-    const e10_N = currentContact && currentContact.custom_fields.paid === 1 ? 1 : Number(paid);
+    const e10_N = currentContact && currentContact.custom_fields.paid === 1 ? 1 : Number(paid) || 0;
   
     const data = {
       contacts: [
