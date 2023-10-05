@@ -21,7 +21,8 @@ function transformData(data) {
     roistat_visit: data.data.roistat_visit,
     fields: {
       site: data.site, // Замените на нужное значение или сформируйте из входящих данных
-      source: "", // Замените на нужное значение или сформируйте из входящих данных
+      ip: data.data.user_ip,
+      country: data.data.user_country, // Замените на нужное значение или сформируйте из входящих данных
     },
   };
 
