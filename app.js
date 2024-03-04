@@ -16,7 +16,7 @@ function transformData(data) {
     title: "Webflow", // Замените на нужное значение или сформируйте из входящих данных
     name: data.data.name,
     email: data.data.email,
-    phone: data.data.phone_full,
+    phone: data.data.phone_full || data.data.phone,
     comment: data.data.page_url, // Замените на нужное значение или сформируйте из входящих данных
     roistat_visit: data.data.roistat_visit,
     fields: {
