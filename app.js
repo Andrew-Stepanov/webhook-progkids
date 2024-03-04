@@ -22,7 +22,8 @@ function transformData(data) {
     fields: {
       site: data.site, // Замените на нужное значение или сформируйте из входящих данных
       ip: data.data.user_ip,
-      country: data.data.user_country, // Замените на нужное значение или сформируйте из входящих данных
+      country: data.data.user_country,
+      phone: data.data.phone, 
     },
   };
 
