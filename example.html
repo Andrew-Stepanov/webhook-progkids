@@ -1,53 +1,68 @@
 <!-- Lead start to Roistat-->
 <script>
   function parseCookies() {
-    const cookieArray = document.cookie.split(';');
+    const cookieArray = document.cookie.split(";");
     let cookies = {};
 
     for (const cookie of cookieArray) {
-      let [key, value] = cookie.trim().split('=');
+      let [key, value] = cookie.trim().split("=");
       cookies[key] = value;
     }
 
     return cookies;
   }
-  
+
   function addPageUrlToForm(form) {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'page_url';
-      input.value = document.location.href;
-      form.appendChild(input);
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "page_url";
+    input.value = document.location.href;
+    form.appendChild(input);
   }
 
   function addCookiesToForm(form) {
     const cookies = parseCookies();
 
     for (const [key, value] of Object.entries(cookies)) {
-      const input = document.createElement('input');
-      input.type = 'hidden';
+      const input = document.createElement("input");
+      input.type = "hidden";
       input.name = `cookies[${key}]`;
       input.value = value;
       form.appendChild(input);
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const forms = document.querySelectorAll('form');
+  document.addEventListener("DOMContentLoaded", () => {
+    const forms = document.querySelectorAll("form");
     forms.forEach((form) => {
-      form.addEventListener('submit', (event) => {
+      form.addEventListener("submit", (event) => {
         event.preventDefault();
         addCookiesToForm(form);
         addPageUrlToForm(form);
-        gtag('event', 'form_submit');
-        ym(48800852,'reachGoal','form_submit');
+
+        const formType = form.getAttribute("data-name"); // Получаем тип формы
+
+        switch (formType) {
+          case "lead":
+            gtag("event", "form_submit");
+            ym(48800852, "reachGoal", "form_submit");
+            break;
+          case "subscribe":
+            gtag("event", "subscribe_submit");
+            // Вы можете добавить аналогичные вызовы для других аналитических платформ здесь, если они отличаются для подписки
+            break;
+          default:
+            gtag("event", "form_submit");
+            ym(48800852, "reachGoal", "form_submit");
+            console.error("Unknown form type:", formType);
+        }
 
         const formData = new FormData(form);
 
         fetch(form.action, {
           method: form.method,
           body: formData,
-          credentials: 'same-origin',
+          credentials: "same-origin",
         })
           .then((response) => {
             if (response.ok) {
@@ -61,6 +76,104 @@
           .catch((error) => {
             // Обработка ошибок сети
             // Здесь вы можете добавить дополнительные действия, например, вывод сообщения об ошибке
+          });
+      });
+    });
+  });
+</script>
+<!-- Lead end to Roistat -->
+
+<!-- Lead start to Roistat 05/10/2023-->
+<script>
+  function parseCookies() {
+    const cookieArray = document.cookie.split(";");
+    let cookies = {};
+
+    for (const cookie of cookieArray) {
+      let [key, value] = cookie.trim().split("=");
+      cookies[key] = value;
+    }
+
+    return cookies;
+  }
+
+  function addPageUrlToForm(form) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "page_url";
+    input.value = document.location.href;
+    form.appendChild(input);
+  }
+
+  function addCookiesToForm(form) {
+    const cookies = parseCookies();
+
+    for (const [key, value] of Object.entries(cookies)) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = `cookies[${key}]`;
+      input.value = value;
+      form.appendChild(input);
+    }
+  }
+
+  async function getUserIPInfo() {
+    try {
+      const response = await fetch("https://get.geojs.io/v1/ip/country.json");
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Unable to get IP address and country:", error);
+      return null;
+    }
+  }
+
+  async function addIPInfoToForm(form) {
+    const userInfo = await getUserIPInfo();
+    if (userInfo) {
+      const ipInput = document.createElement("input");
+      ipInput.type = "hidden";
+      ipInput.name = "user_ip";
+      ipInput.value = userInfo.ip;
+      form.appendChild(ipInput);
+
+      const countryInput = document.createElement("input");
+      countryInput.type = "hidden";
+      countryInput.name = "user_country";
+      countryInput.value = userInfo.name;
+      form.appendChild(countryInput);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const forms = document.querySelectorAll("form");
+
+    forms.forEach(async (form) => {
+      await addIPInfoToForm(form);
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        addCookiesToForm(form);
+        addPageUrlToForm(form);
+        gtag("event", "form_submit");
+        ym(48800852, "reachGoal", "form_submit");
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+          method: form.method,
+          body: formData,
+          credentials: "same-origin",
+        })
+          .then((response) => {
+            if (response.ok) {
+              // Successful form submission
+            } else {
+              // Error in form submission
+            }
+          })
+          .catch((error) => {
+            // Network error handling
           });
       });
     });
