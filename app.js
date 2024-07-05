@@ -2,6 +2,8 @@ const express = require("express");
 const axios = require("axios");
 const sendgrid = require("./sendgrid");
 const typeform = require("./typeform");
+const { scheduleFlocktory } = require('./flocktory');
+
 require("dotenv").config();
 
 const app = express();
@@ -130,3 +132,5 @@ app.listen(port, () => {
   console.log(`Webhook server listening on port ${port}`);
   //  sendgrid.sendTestEmail();
 });
+
+scheduleFlocktory();
