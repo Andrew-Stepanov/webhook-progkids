@@ -3,6 +3,7 @@ const axios = require("axios");
 const sendgrid = require("./sendgrid");
 const typeform = require("./typeform");
 const { scheduleFlocktory } = require('./flocktory');
+const { transformData } = require("./transformData");
 
 require("dotenv").config();
 
@@ -12,27 +13,6 @@ app.use(express.json());
 
 // Замените этими значениями настройки своего webhook-получателя
 const webhookReceiverUrl = process.env.WEBHOOK_RECEIVER_URL;
-
-function transformData(data) {
-  const transformedData = {
-    title: "Webflow", // Замените на нужное значение или сформируйте из входящих данных
-    name: data.data.name,
-    email: data.data.email,
-    phone: data.data.phone_full || data.data.phone,
-    comment: data.data.page_url, // Замените на нужное значение или сформируйте из входящих данных
-    roistat_visit: data.data.roistat_visit,
-    fields: {
-      site: data.site, // Замените на нужное значение или сформируйте из входящих данных
-      ip: data.data.user_ip,  
-      country: data.data.user_time_zone,
-      time: data.data.submission_time,
-      ipCountry: data.data.user_country,
-      phone: data.data.phone, 
-    },
-  };
-
-  return transformedData;
-}
 
 const excludedFormName = ["doNotSendForm", "doNotSendForm-1"];
 

@@ -9,6 +9,7 @@ const transformData = (lead) => ({
   name: lead.name,
   email: lead.email,
   phone: lead.phone,
+  roistat_visit: 'Flocktory',
   fields: {
     created_at: lead.created_at
   }
