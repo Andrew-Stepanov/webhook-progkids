@@ -9,7 +9,7 @@ const transformData = (lead) => ({
   name: lead.name,
   email: lead.email,
   phone: lead.phone,
-  roistat_visit: 'Flocktory',
+  roistat_visit: `flocktory_${lead.campaign_id}`,
   fields: {
     created_at: lead.created_at
   }
@@ -24,7 +24,8 @@ const loadLeads = async () => {
       page: 1,
       per_page: 100,
       from: now - 60,
-      to: now
+      to: now,
+      add_fields: "campaign_id"
     }
   });
 
