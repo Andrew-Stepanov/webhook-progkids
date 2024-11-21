@@ -1,0 +1,239 @@
+<!-- Отправка события в пиксель -->
+<script>
+    function sendLeadEvent() {
+      fbq("track", "Lead");
+    }
+  </script>
+  <!-- Конец Отправка события в пиксель -->
+  
+  <!-- Roistat Counter Start -->
+  <script>
+    (function (w, d, s, h, id) {
+      w.roistatProjectId = id;
+      w.roistatHost = h;
+      var p = d.location.protocol == "https:" ? "https://" : "http://";
+      var u = /^.*roistat_visit=[^;]+(.*)?$/.test(d.cookie)
+        ? "/dist/module.js"
+        : "/api/site/1.0/" +
+          id +
+          "/init?referrer=" +
+          encodeURIComponent(d.location.href);
+      var js = d.createElement(s);
+      js.charset = "UTF-8";
+      js.async = 1;
+      js.src = p + h + u;
+      var js2 = d.getElementsByTagName(s)[0];
+      js2.parentNode.insertBefore(js, js2);
+    })(
+      window,
+      document,
+      "script",
+      "cloud.roistat.com",
+      "add822b329d3459284f58716231b7814"
+    );
+  </script>
+  <!-- Roistat Counter End -->
+  
+  <!-- Lead start to Roistat -->
+  <script>
+    let geoData = null;
+  
+    async function fetchGeoData() {
+      if (geoData) {
+        return geoData;
+      }
+  
+      try {
+        const response = await fetch("https://get.geojs.io/v1/ip/country.json");
+        geoData = await response.json();
+        return geoData;
+      } catch (error) {
+        console.error("Unable to get IP address and country:", error);
+        return null;
+      }
+    }
+  
+    function addCustomCookiesToForm(form) {
+      const cookies = document.cookie.split(";").reduce((acc, cookie) => {
+        const [key, value] = cookie.trim().split("=");
+        acc[key] = value;
+        return acc;
+      }, {});
+  
+      // Пример использования специфичных имен полей:
+      if (cookies.roistat_visit) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "roistat_visit";
+        input.value = cookies.roistat_visit;
+        form.appendChild(input);
+      }
+
+      if (cookies._ga) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "google_analytics_id";
+        input.value = cookies._ga;
+        form.appendChild(input);
+      }
+
+      if (cookies._ym_uid) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "yandex_metrica_uid";
+        input.value = cookies._ym_uid;
+        form.appendChild(input);
+      }
+
+      // Добавьте другие необходимые cookies с пользовательскими именами, если нужно
+    }
+  
+    async function addIPInfoToForm(form) {
+      const userInfo = await fetchGeoData();
+      if (userInfo) {
+        const ipInput = document.createElement("input");
+        ipInput.type = "hidden";
+        ipInput.name = "user_ip";
+        ipInput.value = userInfo.ip;
+        form.appendChild(ipInput);
+  
+        const countryInput = document.createElement("input");
+        countryInput.type = "hidden";
+        countryInput.name = "user_country";
+        countryInput.value = userInfo.name;
+        form.appendChild(countryInput);
+      }
+    }
+  
+    function addPageUrlToForm(form) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "page_url";
+      input.value = document.location.href;
+      form.appendChild(input);
+    }
+  
+    function addCurrentTimeToForm(form) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "submission_time";
+      input.value = new Date().toLocaleString();
+      form.appendChild(input);
+    }
+  
+    function addTimeZoneToForm(form) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "user_time_zone";
+      input.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      form.appendChild(input);
+    }
+  
+    document.addEventListener("DOMContentLoaded", async () => {
+      const forms = document.querySelectorAll("form");
+  
+      forms.forEach(async (form) => {
+        await addIPInfoToForm(form);
+        addPageUrlToForm(form);
+        addCurrentTimeToForm(form);
+        addTimeZoneToForm(form);
+  
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          addCustomCookiesToForm(form);
+  
+          const formType = form.getAttribute("data-name"); // Получаем тип формы
+  
+          switch (formType) {
+            case "lead":
+              gtag("event", "form_submit");
+              ym(48800852, "reachGoal", "form_submit");
+              _tmr.push({ type: "reachGoal", id: 3498335, goal: "lead" });
+              sendLeadEvent();
+              break;
+            case "subscribe":
+              gtag("event", "subscribe_submit");
+              ym(48800852, "reachGoal", "subscribe_submit");
+              break;
+            default:
+              gtag("event", "form_submit");
+              ym(48800852, "reachGoal", "form_submit");
+              _tmr.push({ type: "reachGoal", id: 3498335, goal: "lead" });
+              sendLeadEvent();
+              console.error("Unknown form type:", formType);
+          }
+  
+          const formData = new FormData(form);
+  
+          fetch(form.action, {
+            method: form.method,
+            body: formData,
+            credentials: "same-origin",
+          })
+            .then((response) => {
+              if (response.ok) {
+                // Successful form submission
+              } else {
+                // Error in form submission
+              }
+            })
+            .catch((error) => {
+              console.error("Network error during form submission:", error);
+            });
+        });
+      });
+  
+      // Fetch geo data and update the page content
+      const userInfo = await fetchGeoData();
+      if (userInfo && userInfo.country === "RU") {
+        document.getElementById("company").innerText = 'ООО "Прогкидс"';
+        document.getElementById("company-small").innerText = 'ООО "Прогкидс"';
+        document.getElementById("footer-usa").style.display = "none";
+        document.getElementById("footer-eu").style.display = "none";
+        document.getElementById("w-dropdown-toggle-0").style.display = "none";
+      }
+    });
+  </script>
+  <!-- Lead end to Roistat -->
+  
+  <!-- Библиотеки для маски номера телефона в форме -->
+  <link rel="stylesheet" href="path/to/combined.min.css" />
+  <script src="path/to/combined.min.js" defer></script>
+  
+  <!-- Маска телефона -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const phoneInputs = document.querySelectorAll('input[name="phone"]');
+  
+      phoneInputs.forEach(function (input) {
+        const initialCountry = window.location.pathname === '/lending/individualnye-uroki-s-uchitelem' ? 'ru' : 'auto';
+  
+        const iti = window.intlTelInput(input, {
+          initialCountry: initialCountry,
+          showSelectedDialCode: true,
+          geoIpLookup: async function (success, failure) {
+            try {
+              const data = await fetchGeoData();
+              success(data.country.toLowerCase());
+            } catch (error) {
+              failure(error);
+            }
+          },
+          utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.5/build/js/utils.js",
+          customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
+            return "e.g. " + selectedCountryPlaceholder; // Измените этот текст на желаемый
+          },
+          hiddenInput: "phone_full", // or { phone: "phone_full", country: "country_code" }
+        });
+      });
+    });
+  </script>
+  <!-- Маска телефона -->
+  
+  <!-- Yandex.Metrika counter -->
+  <noscript>
+    <div>
+      <img src="https://mc.yandex.ru/watch/48800852" style="position: absolute; left: -9999px" alt="Метрика"/>
+    </div>
+  </noscript>
+  <!-- /Yandex.Metrika counter -->
