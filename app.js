@@ -2,7 +2,8 @@ const express = require("express");
 const axios = require("axios");
 const sendgrid = require("./sendgrid");
 const typeform = require("./typeform");
-const { scheduleFlocktory } = require('./flocktory');
+const { scheduleFlocktory } = require("./flocktory");
+const { sendAdmitadPostback } = require("./admitad");
 
 require("dotenv").config();
 
@@ -21,9 +22,10 @@ function transformData(data) {
     phone: data.data.phone_full || data.data.phone,
     comment: data.data.page_url, // Замените на нужное значение или сформируйте из входящих данных
     roistat_visit: data.data.roistat_visit,
+    admitad_uid: data.data.admitad_uid,
     fields: {
       site: data.site, // Замените на нужное значение или сформируйте из входящих данных
-      ip: data.data.user_ip,  
+      ip: data.data.user_ip,
       country: data.data.user_time_zone,
       time: data.data.submission_time,
       ipCountry: data.data.user_country,
@@ -73,6 +75,13 @@ app.post("/webhook", async (req, res) => {
   try {
     const response = await axios.post(webhookReceiverUrl, transformedData);
     console.log("Webhook sent:", transformedData);
+
+    if (transformedData.admitad_uid) {
+      await sendAdmitadPostback({
+        uid: transformedData.admitad_uid,
+        order_id: transformedData.email
+      });
+    }
     res.sendStatus(200);
   } catch (error) {
     console.error("Error sending webhook:", error.message);
