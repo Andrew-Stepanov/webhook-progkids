@@ -22,7 +22,7 @@ async function sendAdmitadPostback({ admitad_uid, order_id }) {
     const response = await axios.get(
       `https://ad.admitad.com/r?${queryParams.toString()}`
     );
-
+    console.log("admitad ok", queryParams.toString());
     return response.data;
   } catch (error) {
     console.error("Ошибка при отправке postback в Admitad:", error.message);
