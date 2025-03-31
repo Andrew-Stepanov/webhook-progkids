@@ -79,7 +79,7 @@ app.post("/webhook", async (req, res) => {
     if (transformedData.admitad_uid) {
       await sendAdmitadPostback({
         admitad_uid: transformedData.admitad_uid,
-        order_id: Date.now()
+        email: transformedData.email
       });
     }
     res.sendStatus(200);
