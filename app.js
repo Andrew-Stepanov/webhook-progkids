@@ -4,7 +4,8 @@ const sendgrid = require("./sendgrid");
 const typeform = require("./typeform");
 const { scheduleFlocktory } = require("./flocktory");
 const { sendAdmitadPostback } = require("./admitad");
-
+const { sendSalidRegisterPostback, sendSalidSellPostback } = require("./salid");
+const { checkAuth } = require("./utils");
 require("dotenv").config();
 
 const app = express();
@@ -22,7 +23,6 @@ function transformData(data) {
     phone: data.data.phone_full || data.data.phone,
     comment: data.data.page_url, // Замените на нужное значение или сформируйте из входящих данных
     roistat_visit: data.data.roistat_visit,
-    admitad_uid: data.data.admitad_uid,
     fields: {
       site: data.site, // Замените на нужное значение или сформируйте из входящих данных
       ip: data.data.user_ip,
@@ -71,17 +71,25 @@ app.post("/webhook", async (req, res) => {
   // Ваша текущая логика обработки вебхуков продолжает выполняться здесь
 
   const transformedData = transformData(receivedData);
-
+  const originalData = receivedData.data;
   try {
     const response = await axios.post(webhookReceiverUrl, transformedData);
     console.log("Webhook sent:", transformedData);
 
-    if (transformedData.admitad_uid) {
+    if (originalData.admitad_uid) {
       await sendAdmitadPostback({
-        admitad_uid: transformedData.admitad_uid,
+        admitad_uid: originalData.admitad_uid,
         email: transformedData.email
       });
     }
+
+    if (originalData.salid) {
+      await sendSalidRegisterPostback({ 
+        ...JSON.parse(originalData.salid || "{}"),
+        email: transformedData.email 
+      });
+    }
+
     res.sendStatus(200);
   } catch (error) {
     console.error("Error sending webhook:", error.message);
@@ -133,6 +141,12 @@ app.post("/typeform-webhook", async (req, res) => {
   const extractedData = typeform.extractTypeFormData(receivedData);
   await typeform.addToWebflowCMS(extractedData);
 
+  res.sendStatus(200);
+});
+
+app.post("/payment", checkAuth, async (req, res) => {
+  const { email, sum } = req.body;
+  sendSalidSellPostback(email, sum);
   res.sendStatus(200);
 });
 
