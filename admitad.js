@@ -1,6 +1,7 @@
 const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
+const { generateUniqueOrderId } = require("./utils");
 
 const logDir = path.join(__dirname, 'logs', 'test');
 const logPath = path.join(logDir, 'admitad.csv');
@@ -10,12 +11,6 @@ if (!fs.existsSync(logDir))
 
 if (!fs.existsSync(logPath))
   fs.writeFileSync(logPath, 'timestamp,admitad_uid,order_id,email\n');
-
-function generateUniqueOrderId() {
-  const timestamp = Date.now();
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
-  return `${timestamp}${random}`;
-}
 
 async function sendAdmitadPostback({ admitad_uid, email }) {
   try {
