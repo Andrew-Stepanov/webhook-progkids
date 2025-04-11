@@ -11,14 +11,13 @@ if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
 if (!fs.existsSync(logPath))
   fs.writeFileSync(
     logPath,
-    'timestamp,utm_medium,utm_campaign,utm_term,id_polzovatelya,order_id,email,sum,goal\n'
+    'timestamp,utm_medium,utm_campaign,utm_term,order_id,email,sum,goal\n'
   );
 
 async function sendSalidPostback({
   utm_medium,
   utm_campaign,
   utm_term,
-  id_polzovatelya,
   email,
   sum,
   goal
@@ -34,7 +33,7 @@ async function sendSalidPostback({
     offer: utm_medium,
     webmaster: utm_campaign,
     clickid: utm_term,
-    id_polzovatelya,
+    id_polzovatelya: order_id,
     klient: 'Progkids',
     cel: goal
   });
@@ -46,7 +45,7 @@ async function sendSalidPostback({
 
     try {
       const timestamp = new Date().toISOString();
-      const csvLine = `${timestamp},${utm_medium},${utm_campaign},${utm_term},${id_polzovatelya},${order_id},${email},${sum},${goal}\n`;
+      const csvLine = `${timestamp},${utm_medium},${utm_campaign},${utm_term},${order_id},${email},${sum},${goal}\n`;
       fs.appendFileSync(logPath, csvLine);
     } catch (err) {
       console.error('Ошибка при сохранении лога Salid:', err);
