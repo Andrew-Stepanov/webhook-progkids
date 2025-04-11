@@ -51,13 +51,15 @@ async function sendSalidPostback({
     } catch (err) {
       console.error('Ошибка при сохранении лога Salid:', err);
     }
+
+    return response.data;
   } catch (error) {
     console.error('Ошибка при отправке postback в Salid:', error.message);
   }
 }
 
 async function sendSalidRegisterPostback(options) {
-  await sendSalidPostback({
+  return await sendSalidPostback({
     ...options,
     goal: 'registration'
   });
@@ -76,7 +78,7 @@ async function sendSalidSellPostback(email, sum) {
     return;
   }
 
-  await sendSalidPostback({
+  return await sendSalidPostback({
     ...rows[rows.length - 1],
     email,
     sum,
