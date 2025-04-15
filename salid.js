@@ -64,6 +64,27 @@ async function sendSalidRegisterPostback(options) {
   });
 }
 
+async function sendSalidOrderPostback(email) {
+  const rows = await findRowsByEmail(logPath, email);
+
+  if (!rows.length) {
+    console.log('Salid: no row found for email:', email);
+    return;
+  }
+
+  if (rows.find((row) => row.goal === 'sale' || row.goal === 'order')) {
+    console.log('Salid: sale or order already exists for email:', email);
+    return;
+  }
+
+  return await sendSalidPostback({
+    ...rows[rows.length - 1],
+    email,
+    sum: 1,
+    goal: 'order'
+  });
+}
+
 async function sendSalidSellPostback(email, sum) {
   const rows = await findRowsByEmail(logPath, email);
 
@@ -87,5 +108,6 @@ async function sendSalidSellPostback(email, sum) {
 
 module.exports = {
   sendSalidRegisterPostback,
-  sendSalidSellPostback
+  sendSalidSellPostback,
+  sendSalidOrderPostback
 };

@@ -150,6 +150,12 @@ app.post("/payment", checkAuth, async (req, res) => {
   res.sendStatus(200);
 });
 
+app.post("/trial", checkAuth, async (req, res) => {
+  const { email } = req.body;
+  sendSalidOrderPostback(email);
+  res.sendStatus(200);
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Webhook server listening on port ${port}`);
