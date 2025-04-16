@@ -4,7 +4,7 @@ const sendgrid = require("./sendgrid");
 const typeform = require("./typeform");
 const { scheduleFlocktory } = require("./flocktory");
 const { sendAdmitadPostback } = require("./admitad");
-const { sendSalidRegisterPostback, sendSalidSellPostback } = require("./salid");
+const { sendSalidRegisterPostback, sendSalidSellPostback, sendSalidOrderPostback } = require("./salid");
 const { checkAuth } = require("./utils");
 require("dotenv").config();
 
