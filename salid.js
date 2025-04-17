@@ -35,7 +35,8 @@ async function sendSalidPostback({
     clickid: utm_term,
     id_polzovatelya: order_id,
     klient: 'Progkids',
-    cel: goal
+    cel: goal,
+    summa_zakaza: sum
   });
 
   try {
