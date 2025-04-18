@@ -97,6 +97,39 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
+app.post("/puzzle", async (req, res) => {
+  const { body } = req;
+  console.log("Received puzzle-brain webhook data:", body);
+
+  const requiredFields = ['name', 'email', 'phone', 'roistat_visit'];
+  const missingFields = requiredFields.filter(field => !body[field]);
+
+  if (missingFields.length > 0) {
+    console.error("Puzzle-brain: отсутствуют поля в данных:", missingFields.join(', '));
+    res.status(400).send({ error: `Указаны не все обязательные поля` });
+    return;
+  }
+  
+  const transformedData = {
+    title: "puzzle-brain", 
+    name: body.name,
+    email: body.email,
+    phone: body.phone,
+    roistat_visit: body.roistat_visit
+  };
+  
+  try {
+    await axios.post(webhookReceiverUrl, transformedData);
+    console.log("Webhook for puzzle-brain sent:", transformedData);
+
+    // res.sendStatus(200);
+    res.redirect('https://progkids.com');
+  } catch (error) {
+    console.error("Error sending webhook:", error.message);
+    res.sendStatus(500);
+  }
+});
+
 // Добавьте новый маршрут для добавления контакта в SendGrid
 app.post("/sendgrid-add", async (req, res) => {
   const receivedData = req.body;
