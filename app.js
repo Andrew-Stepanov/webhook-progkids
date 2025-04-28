@@ -115,7 +115,8 @@ app.post("/puzzle", async (req, res) => {
     name: body.name,
     email: body.email,
     phone: body.phone,
-    roistat_visit: body.roistat_visit
+    roistat_visit: body.roistat_visit,
+    fields: { site: `${req.get('Origin')} (${req.get('Referer')})` },
   };
   
   try {
