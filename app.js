@@ -3,7 +3,7 @@ const axios = require("axios");
 const sendgrid = require("./sendgrid");
 const typeform = require("./typeform");
 const { scheduleFlocktory } = require("./flocktory");
-const { sendAdmitadPostback } = require("./admitad");
+const { sendAdmitadInitialPostback, sendAdmitadSellPostback } = require("./admitad");
 const { sendSalidRegisterPostback, sendSalidSellPostback, sendSalidOrderPostback } = require("./salid");
 const { checkAuth } = require("./utils");
 require("dotenv").config();
@@ -77,7 +77,7 @@ app.post("/webhook", async (req, res) => {
     console.log("Webhook sent:", transformedData);
 
     if (originalData.admitad_uid) {
-      await sendAdmitadPostback({
+      await sendAdmitadInitialPostback({
         admitad_uid: originalData.admitad_uid,
         email: transformedData.email
       });
@@ -186,7 +186,13 @@ app.post("/payment", checkAuth, async (req, res) => {
 
 app.post("/trial", checkAuth, async (req, res) => {
   const { email } = req.body;
-  sendSalidOrderPostback(email);
+  await sendSalidOrderPostback(email);
+  res.sendStatus(200);
+});
+
+app.post("/trial-complete", checkAuth, async (req, res) => {
+  const { email } = req.body;
+  await sendAdmitadSellPostback(email);
   res.sendStatus(200);
 });
 
