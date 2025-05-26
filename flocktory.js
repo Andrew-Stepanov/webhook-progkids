@@ -7,6 +7,7 @@ const FLOCKTORY_API_URL =
 const transformData = (lead) => ({
   title: 'Flocktory',
   name: lead.name,
+  email: lead.email,
   phone: lead.phone,
   roistat_visit: `flocktory_${lead.campaign_id}`,
   fields: {
@@ -24,7 +25,7 @@ const loadLeads = async () => {
       per_page: 100,
       from: now - 60,
       to: now,
-      add_fields: "campaign_id"
+      add_fields: 'campaign_id'
     }
   });
 
