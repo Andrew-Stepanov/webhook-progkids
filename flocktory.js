@@ -7,7 +7,7 @@ const FLOCKTORY_API_URL =
 const transformData = (lead) => ({
   title: 'Flocktory',
   name: lead.name,
-  email: lead.email,
+  email: lead.email === 'xname@flocktory.com' ? undefined : lead.email,
   phone: lead.phone,
   roistat_visit: `flocktory_${lead.campaign_id}`,
   fields: {
