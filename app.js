@@ -71,6 +71,7 @@ app.post("/webhook", async (req, res) => {
   // Ваша текущая логика обработки вебхуков продолжает выполняться здесь
 
   const transformedData = transformData(receivedData);
+  if (!transformedData.phone) return res.sendStatus(500);
   const originalData = receivedData.data;
   try {
     const response = await axios.post(webhookReceiverUrl, transformedData);
