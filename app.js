@@ -17,7 +17,9 @@ const webhookReceiverUrl = process.env.WEBHOOK_RECEIVER_URL;
 
 function transformData(data) {
   const transformedData = {
-    title: "Webflow", // Замените на нужное значение или сформируйте из входящих данных
+    title: data.title || "Webflow", // Замените на нужное значение или сформируйте из входящих данных
+    admitad_uid: data.data.admitad_uid,
+    salid: data.data.salid,
     name: data.data.name,
     email: data.data.email,
     phone: data.data.phone_full || data.data.phone,
@@ -37,6 +39,64 @@ function transformData(data) {
 }
 
 const excludedFormName = ["doNotSendForm", "doNotSendForm-1"];
+
+const processWebhook = async (transformedData, res) => {
+  if (!transformedData.phone) return res.sendStatus(500);
+  try {
+    const response = await axios.post(webhookReceiverUrl, transformedData);
+    console.log("Webhook sent:", transformedData);
+
+    if (transformedData.admitad_uid) {
+      await sendAdmitadInitialPostback({
+        admitad_uid: transformedData.admitad_uid,
+        email: transformedData.email
+      });
+    }
+
+    if (transformedData.salid) {
+      await sendSalidRegisterPostback({ 
+        ...JSON.parse(transformedData.salid || "{}"),
+        email: transformedData.email 
+      });
+    }
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("Error sending webhook:", error.message);
+    res.sendStatus(500);
+  }
+}
+
+app.post("/webhook_v2", async (req, res) => {
+  const receivedData = req.body;
+  console.log("Received webhook data v2:", receivedData);
+
+  const { popupId, name, phone, email, comment, child_age, fbclid } = req.body;
+  const roistat_visit = req.body.roistat_visit || req.cookies?.roistat_visit || '';
+  const site_url = req.body.site_url || req.headers.referer || 'unknown';
+  const timezone = req.body.timezone || '';
+
+  const label = popupId === 'call-me-button' ? 'Жду звонка' : 'Двухэтапная форма';
+  await processWebhook({
+    title: `Заявка с ${label}`,
+    admitad_uid: req.body.admitad_uid,
+    salid: req.body.salid,
+    name,
+    email: email || '',
+    phone,
+    comment: comment || '',
+    roistat_visit,
+    child_age: child_age || '',
+    fields: {
+      site: req.headers.referer || 'unknown',
+      source: popupId,
+      popup_label: label,
+      site_url,
+      timezone,
+      fbclid
+    }
+  }, res);
+});
 
 app.post("/webhook", async (req, res) => {
   const receivedData = req.body;
@@ -68,34 +128,8 @@ app.post("/webhook", async (req, res) => {
     }
   }
 
-  // Ваша текущая логика обработки вебхуков продолжает выполняться здесь
-
   const transformedData = transformData(receivedData);
-  if (!transformedData.phone) return res.sendStatus(500);
-  const originalData = receivedData.data;
-  try {
-    const response = await axios.post(webhookReceiverUrl, transformedData);
-    console.log("Webhook sent:", transformedData);
-
-    if (originalData.admitad_uid) {
-      await sendAdmitadInitialPostback({
-        admitad_uid: originalData.admitad_uid,
-        email: transformedData.email
-      });
-    }
-
-    if (originalData.salid) {
-      await sendSalidRegisterPostback({ 
-        ...JSON.parse(originalData.salid || "{}"),
-        email: transformedData.email 
-      });
-    }
-
-    res.sendStatus(200);
-  } catch (error) {
-    console.error("Error sending webhook:", error.message);
-    res.sendStatus(500);
-  }
+  await processWebhook(transformedData, res);
 });
 
 app.post("/puzzle", async (req, res) => {
