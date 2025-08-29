@@ -9,12 +9,6 @@
     position: 'bottom-left'
   };
 
-  function sendLeadEvent() {
-    if (typeof fbq === 'function') {
-      fbq('track', 'Lead');
-    }
-  }
-
   // CSS styles
   const styles = `
       .callback-button-wrapper {
@@ -559,8 +553,7 @@
     const labelBtn = document.createElement('button');
     labelBtn.type = 'button';
     labelBtn.className = 'callback-button-label';
-    labelBtn.innerHTML =
-      '<span>Заказать</span><span>звонок</span>';
+    labelBtn.innerHTML = '<span>Заказать</span><span>звонок</span>';
     labelBtn.addEventListener('click', showModal);
     wrapper.appendChild(button);
     wrapper.appendChild(labelBtn);
@@ -608,9 +601,7 @@
     modal.querySelector('.callback-close').addEventListener('click', hideModal);
     // Подключаем libphonenumber-js
     loadLibPhoneNumber(() => {
-      console.log(
-        '[Callback Popup] libphonenumber-js инициализирован'
-      );
+      console.log('[Callback Popup] libphonenumber-js инициализирован');
     });
     return modal;
   }
@@ -708,74 +699,14 @@
     return errors;
   }
 
-  // Функция для получения roistat_visit
-  function getRoistatVisit() {
-    // 1. �?з куки
-    const match = document.cookie.match(/(?:^|; )roistat_visit=([^;]*)/);
-    if (match) return decodeURIComponent(match[1]);
-    // 2. �?з URL ?roistat=...
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('roistat')) return urlParams.get('roistat');
-    // 3. �?з URL ?rs=...
-    if (urlParams.get('rs')) return urlParams.get('rs');
-    return '';
-  }
-
-  // Функция для получения fbclid
-  function getFbclid() {
-    try {
-      // 1. �?з URL параметра fbclid
-      const urlParams = new URLSearchParams(window.location.search);
-      const fbclidFromQuery = urlParams.get('fbclid');
-      if (fbclidFromQuery) {
-        console.log(
-          '[FBCLID] Найден в query параметрах:',
-          fbclidFromQuery
-        );
-        return fbclidFromQuery;
-      }
-
-      // 2. �?з URL параметра fbclid в hash
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const fbclidFromHash = hashParams.get('fbclid');
-      if (fbclidFromHash) {
-        console.log(
-          '[FBCLID] Найден в hash параметрах:',
-          fbclidFromHash
-        );
-        return fbclidFromHash;
-      }
-
-      // 3. Альтернативный способ - через regex
-      const url = window.location.href;
-      const fbclidMatch = url.match(/[?&]fbclid=([^&#]*)/);
-      if (fbclidMatch && fbclidMatch[1]) {
-        console.log('[FBCLID] Найден через regex:', fbclidMatch[1]);
-        return decodeURIComponent(fbclidMatch[1]);
-      }
-
-      console.log('[FBCLID] Не найден в URL');
-      console.log('[FBCLID] Текущий URL:', window.location.href);
-      console.log('[FBCLID] Query параметры:', window.location.search);
-      console.log('[FBCLID] Hash параметры:', window.location.hash);
-      return '';
-    } catch (error) {
-      console.error(
-        '[FBCLID] Ошибка при извлечении fbclid:',
-        error
-      );
-      return '';
-    }
-  }
-
   // Submit form
   async function submitForm(formData) {
     try {
       const phone = formData.phone;
-      const roistat_visit = getRoistatVisit();
+      const roistat_visit = window.getRoistatVisit();
       const site_url = window.location.href;
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const fbclid = getFbclid();
+      const fbclid = window.getFbclid();
       console.log('[SUBMIT] Отправляем данные:', {
         phone,
         roistat_visit,
@@ -810,12 +741,8 @@
       });
       const result = await response.json();
       if (result.success) {
-        if (typeof gtag === 'function') gtag('event', 'form_submit');
-        if (typeof ym === 'function') ym(48800852, 'reachGoal', 'form_submit');
-        if (typeof twq === 'function') twq('event', 'tw-pzuj8-pzujb', {});
-        if (typeof _tmr !== 'undefined')
-          _tmr.push({ type: 'reachGoal', id: 3498335, goal: 'lead' });
-        sendLeadEvent();
+        window.sendAnalyticsEvents();
+        window.sendLeadEvent();
         // Скрываем поле и кнопку, показываем красивый блок успеха
         if (phoneField) phoneField.style.display = 'none';
         if (submitBtn) submitBtn.style.display = 'none';
@@ -866,10 +793,7 @@
           });
         }
       } else {
-        showMessage(
-          result.error || 'Ошибка отправки заявки',
-          'error'
-        );
+        showMessage(result.error || 'Ошибка отправки заявки', 'error');
         // Показываем поля обратно
         if (phoneField) phoneField.style.display = '';
         if (submitBtn) submitBtn.style.display = '';
@@ -884,10 +808,7 @@
       }
     } catch (error) {
       console.error('Form submission error:', error);
-      showMessage(
-        'Ошибка отправки заявки. Попробуйте позже.',
-        'error'
-      );
+      showMessage('Ошибка отправки заявки. Попробуйте позже.', 'error');
       const submitBtn = document.querySelector('.callback-submit');
       if (submitBtn) {
         submitBtn.disabled = false;

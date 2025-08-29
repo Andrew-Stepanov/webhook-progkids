@@ -9,12 +9,6 @@
     position: 'bottom-right'
   };
 
-  function sendLeadEvent() {
-    if (typeof fbq === 'function') {
-      fbq('track', 'Lead');
-    }
-  }
-
   // --- Стили (минимально для примера, можно доработать) ---
   const styles = `
       .twostep-popup-wrapper { position: fixed; bottom: 32px; right: 32px; z-index: 10000; }
@@ -50,9 +44,7 @@
     script.src = 'https://popup.progkids.com/libphonenumber-max.js';
     script.onload = callback;
     script.onerror = () => {
-      console.error(
-        '[TwoStepPopup] Не удалось загрузить libphonenumber-js'
-      );
+      console.error('[TwoStepPopup] Не удалось загрузить libphonenumber-js');
     };
     document.body.appendChild(script);
   }
@@ -126,84 +118,18 @@
       if (!response.ok || (result && result.success === false)) {
         return {
           success: false,
-          error:
-            result.error ||
-            'Ошибка отправки заявки. Попробуйте позже.'
+          error: result.error || 'Ошибка отправки заявки. Попробуйте позже.'
         };
       }
-      if (typeof gtag === 'function') gtag('event', 'form_submit');
-      if (typeof ym === 'function') ym(48800852, 'reachGoal', 'form_submit');
-      if (typeof twq === 'function') twq('event', 'tw-pzuj8-pzujb', {});
-      if (typeof _tmr !== 'undefined')
-        _tmr.push({ type: 'reachGoal', id: 3498335, goal: 'lead' });
-      sendLeadEvent();
+
+      window.sendAnalyticsEvents();
+      window.sendLeadEvent();
       return { success: true };
     } catch (err) {
       return {
         success: false,
-        error:
-          'Ошибка отправки заявки. Попробуйте позже.'
+        error: 'Ошибка отправки заявки. Попробуйте позже.'
       };
-    }
-  }
-
-  // Функция для получения roistat_visit (как в popup.js)
-  function getRoistatVisit() {
-    // 1. �?з куки
-    const match = document.cookie.match(/(?:^|; )roistat_visit=([^;]*)/);
-    if (match) return decodeURIComponent(match[1]);
-    // 2. �?з URL ?roistat=...
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('roistat')) return urlParams.get('roistat');
-    // 3. �?з URL ?rs=...
-    if (urlParams.get('rs')) return urlParams.get('rs');
-    return '';
-  }
-
-  // Функция для получения fbclid
-  function getFbclid() {
-    try {
-      // 1. �?з URL параметра fbclid
-      const urlParams = new URLSearchParams(window.location.search);
-      const fbclidFromQuery = urlParams.get('fbclid');
-      if (fbclidFromQuery) {
-        console.log(
-          '[FBCLID] Найден в query параметрах:',
-          fbclidFromQuery
-        );
-        return fbclidFromQuery;
-      }
-
-      // 2. �?з URL параметра fbclid в hash
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const fbclidFromHash = hashParams.get('fbclid');
-      if (fbclidFromHash) {
-        console.log(
-          '[FBCLID] Найден в hash параметрах:',
-          fbclidFromHash
-        );
-        return fbclidFromHash;
-      }
-
-      // 3. Альтернативный способ - через regex
-      const url = window.location.href;
-      const fbclidMatch = url.match(/[?&]fbclid=([^&#]*)/);
-      if (fbclidMatch && fbclidMatch[1]) {
-        console.log('[FBCLID] Найден через regex:', fbclidMatch[1]);
-        return decodeURIComponent(fbclidMatch[1]);
-      }
-
-      console.log('[FBCLID] Не найден в URL');
-      console.log('[FBCLID] Текущий URL:', window.location.href);
-      console.log('[FBCLID] Query параметры:', window.location.search);
-      console.log('[FBCLID] Hash параметры:', window.location.hash);
-      return '';
-    } catch (error) {
-      console.error(
-        '[FBCLID] Ошибка при извлечении fbclid:',
-        error
-      );
-      return '';
     }
   }
 
@@ -317,8 +243,7 @@
       form.phone.classList.add('error');
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent =
-          'Записаться на пробный урок';
+        submitBtn.textContent = 'Записаться на пробный урок';
       }
       return;
     }
@@ -328,8 +253,8 @@
     savedPhone = phone;
     savedPage = window.location.href;
     savedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const roistat_visit = getRoistatVisit();
-    const fbclid = getFbclid();
+    const roistat_visit = window.getRoistatVisit();
+    const fbclid = window.getFbclid();
     // Отправляем первый этап (только телефон, страница, таймзона, roistat_visit, fbclid)
     const result = await sendWebhook({
       popupId: CONFIG.popupId,
@@ -343,8 +268,7 @@
       showMessage1(result.error, 'error');
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent =
-          'Записаться на пробный урок';
+        submitBtn.textContent = 'Записаться на пробный урок';
       }
       return;
     }
@@ -427,18 +351,12 @@
       hasError = true;
     }
     if (!child_age || isNaN(child_age) || child_age < 1 || child_age > 25) {
-      showMessage2(
-        'Введите возраст ребенка от 1 до 25',
-        'error'
-      );
+      showMessage2('Введите возраст ребенка от 1 до 25', 'error');
       form.child_age.classList.add('error');
       hasError = true;
     }
     if (!call_time) {
-      showMessage2(
-        'Выберите удобное время для звонка',
-        'error'
-      );
+      showMessage2('Выберите удобное время для звонка', 'error');
       form.call_time.classList.add('error');
       hasError = true;
     }
@@ -454,8 +372,8 @@
     form.child_age.classList.remove('error');
     form.call_time.classList.remove('error');
     showMessage2('', '');
-    const roistat_visit = getRoistatVisit();
-    const fbclid = getFbclid();
+    const roistat_visit = window.getRoistatVisit();
+    const fbclid = window.getFbclid();
     // Формируем comment
     const comment = `Возраст ребёнка: ${child_age}, Удобное время для звонка: ${call_time}, Часовой пояс: ${savedTimezone}`;
     // Логируем отправляемые данные
@@ -472,10 +390,7 @@
       roistat_visit: roistat_visit,
       fbclid: fbclid
     };
-    console.log(
-      '[popup2.js] Отправка данных второго этапа:',
-      dataToSend
-    );
+    console.log('[popup2.js] Отправка данных второго этапа:', dataToSend);
     // Отправляем второй этап (все поля)
     const result = await sendWebhook(dataToSend);
     if (!result.success) {

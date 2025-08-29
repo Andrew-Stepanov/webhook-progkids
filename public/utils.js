@@ -1,0 +1,70 @@
+function sendLeadEvent() {
+  if (typeof fbq === 'function') {
+    fbq('track', 'Lead');
+  }
+}
+
+// Функция для получения roistat_visit
+function getRoistatVisit() {
+  // 1. Из куки
+  const match = document.cookie.match(/(?:^|; )roistat_visit=([^;]*)/);
+  if (match) return decodeURIComponent(match[1]);
+  // 2. Из URL ?roistat=...
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('roistat')) return urlParams.get('roistat');
+  // 3. Из URL ?rs=...
+  if (urlParams.get('rs')) return urlParams.get('rs');
+  return '';
+}
+
+// Функция для получения fbclid
+function getFbclid() {
+  try {
+    // 1. Из URL параметра fbclid
+    const urlParams = new URLSearchParams(window.location.search);
+    const fbclidFromQuery = urlParams.get('fbclid');
+    if (fbclidFromQuery) {
+      console.log('[FBCLID] Найден в query параметрах:', fbclidFromQuery);
+      return fbclidFromQuery;
+    }
+
+    // 2. Из URL параметра fbclid в hash
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const fbclidFromHash = hashParams.get('fbclid');
+    if (fbclidFromHash) {
+      console.log('[FBCLID] Найден в hash параметрах:', fbclidFromHash);
+      return fbclidFromHash;
+    }
+
+    // 3. Альтернативный способ - через regex
+    const url = window.location.href;
+    const fbclidMatch = url.match(/[?&]fbclid=([^&#]*)/);
+    if (fbclidMatch && fbclidMatch[1]) {
+      console.log('[FBCLID] Найден через regex:', fbclidMatch[1]);
+      return decodeURIComponent(fbclidMatch[1]);
+    }
+
+    console.log('[FBCLID] Не найден в URL');
+    console.log('[FBCLID] Текущий URL:', window.location.href);
+    console.log('[FBCLID] Query параметры:', window.location.search);
+    console.log('[FBCLID] Hash параметры:', window.location.hash);
+    return '';
+  } catch (error) {
+    console.error('[FBCLID] Ошибка при извлечении fbclid:', error);
+    return '';
+  }
+}
+
+// Функция для отправки аналитических событий
+function sendAnalyticsEvents() {
+  if (typeof gtag === 'function') gtag('event', 'form_submit');
+  if (typeof ym === 'function') ym(48800852, 'reachGoal', 'form_submit');
+  if (typeof twq === 'function') twq('event', 'tw-pzuj8-pzujb', {});
+  if (typeof _tmr !== 'undefined')
+    _tmr.push({ type: 'reachGoal', id: 3498335, goal: 'lead' });
+}
+
+window.sendLeadEvent = sendLeadEvent;
+window.getRoistatVisit = getRoistatVisit;
+window.getFbclid = getFbclid;
+window.sendAnalyticsEvents = sendAnalyticsEvents;
