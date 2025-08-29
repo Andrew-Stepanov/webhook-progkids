@@ -1,9 +1,9 @@
 (function () {
   'use strict';
 
-  // РљРѕРЅС„РёРі РґР»СЏ РЅРѕРІРѕРіРѕ РїРѕРїР°РїР°
+  // Конфиг для нового попапа
   const CONFIG = {
-    popupId: 'call-me-2step', // РќРѕРІС‹Р№ СѓРЅРёРєР°Р»СЊРЅС‹Р№ popupId РґР»СЏ РґРІСѓС…СЌС‚Р°РїРЅРѕРіРѕ РїРѕРїР°РїР°
+    popupId: 'call-me-2step', // Новый уникальный popupId для двухэтапного попапа
     serverUrl: 'https://popup.progkids.com',
     buttonColor: '#007bff',
     position: 'bottom-right'
@@ -15,7 +15,7 @@
     }
   }
 
-  // --- РЎС‚РёР»Рё (РјРёРЅРёРјР°Р»СЊРЅРѕ РґР»СЏ РїСЂРёРјРµСЂР°, РјРѕР¶РЅРѕ РґРѕСЂР°Р±РѕС‚Р°С‚СЊ) ---
+  // --- Стили (минимально для примера, можно доработать) ---
   const styles = `
       .twostep-popup-wrapper { position: fixed; bottom: 32px; right: 32px; z-index: 10000; }
       .twostep-popup-btn { width: 60px; height: 60px; border-radius: 50%; background: #27ae60; color: #fff; border: none; font-size: 28px; cursor: pointer; box-shadow: 0 4px 24px rgba(39,174,96,0.18); display: flex; align-items: center; justify-content: center; }
@@ -51,7 +51,7 @@
     script.onload = callback;
     script.onerror = () => {
       console.error(
-        '[TwoStepPopup] РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ libphonenumber-js'
+        '[TwoStepPopup] Не удалось загрузить libphonenumber-js'
       );
     };
     document.body.appendChild(script);
@@ -111,7 +111,7 @@
   let savedPage = '';
   let savedTimezone = '';
 
-  // РЈРЅРёРІРµСЂСЃР°Р»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ РѕС‚РїСЂР°РІРєРё webhook
+  // Универсальная функция отправки webhook
   async function sendWebhook(data) {
     try {
       const response = await fetch(`${CONFIG.serverUrl}/api/webhook`, {
@@ -128,7 +128,7 @@
           success: false,
           error:
             result.error ||
-            'РћС€РёР±РєР° РѕС‚РїСЂР°РІРєРё Р·Р°СЏРІРєРё. РџРѕРїСЂРѕР±СѓР№С‚Рµ РїРѕР·Р¶Рµ.'
+            'Ошибка отправки заявки. Попробуйте позже.'
         };
       }
       if (typeof gtag === 'function') gtag('event', 'form_submit');
@@ -142,65 +142,65 @@
       return {
         success: false,
         error:
-          'РћС€РёР±РєР° РѕС‚РїСЂР°РІРєРё Р·Р°СЏРІРєРё. РџРѕРїСЂРѕР±СѓР№С‚Рµ РїРѕР·Р¶Рµ.'
+          'Ошибка отправки заявки. Попробуйте позже.'
       };
     }
   }
 
-  // Р¤СѓРЅРєС†РёСЏ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ roistat_visit (РєР°Рє РІ popup.js)
+  // Функция для получения roistat_visit (как в popup.js)
   function getRoistatVisit() {
-    // 1. РР· РєСѓРєРё
+    // 1. �?з куки
     const match = document.cookie.match(/(?:^|; )roistat_visit=([^;]*)/);
     if (match) return decodeURIComponent(match[1]);
-    // 2. РР· URL ?roistat=...
+    // 2. �?з URL ?roistat=...
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('roistat')) return urlParams.get('roistat');
-    // 3. РР· URL ?rs=...
+    // 3. �?з URL ?rs=...
     if (urlParams.get('rs')) return urlParams.get('rs');
     return '';
   }
 
-  // Р¤СѓРЅРєС†РёСЏ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ fbclid
+  // Функция для получения fbclid
   function getFbclid() {
     try {
-      // 1. РР· URL РїР°СЂР°РјРµС‚СЂР° fbclid
+      // 1. �?з URL параметра fbclid
       const urlParams = new URLSearchParams(window.location.search);
       const fbclidFromQuery = urlParams.get('fbclid');
       if (fbclidFromQuery) {
         console.log(
-          '[FBCLID] РќР°Р№РґРµРЅ РІ query РїР°СЂР°РјРµС‚СЂР°С…:',
+          '[FBCLID] Найден в query параметрах:',
           fbclidFromQuery
         );
         return fbclidFromQuery;
       }
 
-      // 2. РР· URL РїР°СЂР°РјРµС‚СЂР° fbclid РІ hash
+      // 2. �?з URL параметра fbclid в hash
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const fbclidFromHash = hashParams.get('fbclid');
       if (fbclidFromHash) {
         console.log(
-          '[FBCLID] РќР°Р№РґРµРЅ РІ hash РїР°СЂР°РјРµС‚СЂР°С…:',
+          '[FBCLID] Найден в hash параметрах:',
           fbclidFromHash
         );
         return fbclidFromHash;
       }
 
-      // 3. РђР»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹Р№ СЃРїРѕСЃРѕР± - С‡РµСЂРµР· regex
+      // 3. Альтернативный способ - через regex
       const url = window.location.href;
       const fbclidMatch = url.match(/[?&]fbclid=([^&#]*)/);
       if (fbclidMatch && fbclidMatch[1]) {
-        console.log('[FBCLID] РќР°Р№РґРµРЅ С‡РµСЂРµР· regex:', fbclidMatch[1]);
+        console.log('[FBCLID] Найден через regex:', fbclidMatch[1]);
         return decodeURIComponent(fbclidMatch[1]);
       }
 
-      console.log('[FBCLID] РќРµ РЅР°Р№РґРµРЅ РІ URL');
-      console.log('[FBCLID] РўРµРєСѓС‰РёР№ URL:', window.location.href);
-      console.log('[FBCLID] Query РїР°СЂР°РјРµС‚СЂС‹:', window.location.search);
-      console.log('[FBCLID] Hash РїР°СЂР°РјРµС‚СЂС‹:', window.location.hash);
+      console.log('[FBCLID] Не найден в URL');
+      console.log('[FBCLID] Текущий URL:', window.location.href);
+      console.log('[FBCLID] Query параметры:', window.location.search);
+      console.log('[FBCLID] Hash параметры:', window.location.hash);
       return '';
     } catch (error) {
       console.error(
-        '[FBCLID] РћС€РёР±РєР° РїСЂРё РёР·РІР»РµС‡РµРЅРёРё fbclid:',
+        '[FBCLID] Ошибка при извлечении fbclid:',
         error
       );
       return '';
@@ -208,7 +208,7 @@
   }
 
   // --- Step 1 ---
-  // Р”РёРЅР°РјРёС‡РµСЃРєРёР№ social proof (С„РёРєСЃРёСЂРѕРІР°РЅРЅС‹Р№ РЅР° РґРµРЅСЊ)
+  // Динамический social proof (фиксированный на день)
   function seededRandom(seed) {
     let x = Math.sin(seed) * 10000;
     return x - Math.floor(x);
@@ -219,23 +219,23 @@
     const mm = now.getMonth() + 1;
     const dd = now.getDate();
     const daySeed = yyyy * 10000 + mm * 100 + dd;
-    // Р”РёР°РїР°Р·РѕРЅС‹
+    // Диапазоны
     const min = 30,
-      max = 60; // СЃС‚Р°СЂС‚РѕРІРѕРµ
+      max = 60; // стартовое
     const minEnd = 150,
-      maxEnd = 220; // С„РёРЅР°Р»СЊРЅРѕРµ
-    // Р”РµС‚РµСЂРјРёРЅРёСЂРѕРІР°РЅРЅРѕ РґР»СЏ РґРЅСЏ
+      maxEnd = 220; // финальное
+    // Детерминированно для дня
     const start = Math.round(min + (max - min) * seededRandom(daySeed));
     const end = Math.round(
       minEnd + (maxEnd - minEnd) * seededRandom(daySeed + 1)
     );
-    // Р’СЂРµРјСЏ
+    // Время
     const startHour = 0,
       endHour = 23 + 59 / 60;
     const currentHour = now.getHours() + now.getMinutes() / 60;
     if (currentHour < startHour) return start;
     if (currentHour > endHour) return end;
-    // Р›РёРЅРµР№РЅС‹Р№ СЂРѕСЃС‚
+    // Линейный рост
     const progress = (currentHour - startHour) / (endHour - startHour);
     const count = Math.round(start + (end - start) * progress);
     return count;
@@ -245,21 +245,21 @@
     const container = document.getElementById('twostepFormContainer');
     if (!container) return;
     container.innerHTML = `
-        <button class="twostep-close" type="button" aria-label="Р—Р°РєСЂС‹С‚СЊ">&times;</button>
-        <div class="twostep-title">Р—Р°РїРёС€РёС‚РµСЃСЊ РЅР° Р±РµСЃРїР»Р°С‚РЅС‹Р№ РїСЂРѕР±РЅС‹Р№ СѓСЂРѕРє</div>
+        <button class="twostep-close" type="button" aria-label="Закрыть">&times;</button>
+        <div class="twostep-title">Запишитесь на бесплатный пробный урок</div>
         <div class="twostep-message" id="twostepMessage1"></div>
         <form id="twostepForm1" autocomplete="off">
           <div class="twostep-field">
-            <label for="twostep-phone" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">Р’Р°С€ С‚РµР»РµС„РѕРЅ</label>
+            <label for="twostep-phone" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">Ваш телефон</label>
             <input id="twostep-phone" type="text" class="twostep-input" name="phone" required autocomplete="off" maxlength="20" placeholder="+1 (999) 123-45-67">
           </div>
-          <button type="submit" class="twostep-submit">Р—Р°РїРёСЃР°С‚СЊСЃСЏ РЅР° РїСЂРѕР±РЅС‹Р№ СѓСЂРѕРє</button>
+          <button type="submit" class="twostep-submit">Записаться на пробный урок</button>
           <div style="font-size:12px;color:#888;text-align:center;margin-top:12px;line-height:1.5;">
-            РћС‚РїСЂР°РІР»СЏСЏ Р·Р°СЏРІРєСѓ, РІС‹ СЃРѕРіР»Р°С€Р°РµС‚РµСЃСЊ СЃ <a href="/privacy-policy" target="_blank" style="color:#27ae60;text-decoration:underline;">РїРѕР»РёС‚РёРєРѕР№ РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚Рё</a>.
+            Отправляя заявку, вы соглашаетесь с <a href="/privacy-policy" target="_blank" style="color:#27ae60;text-decoration:underline;">политикой конфиденциальности</a>.
           </div>
         </form>
         <div class="twostep-social-proof" style="margin-top:18px;font-size:13px;color:#27ae60;text-align:center;">
-          РЈР¶Рµ <span id="twostep-leads-count"></span> СЂРѕРґРёС‚РµР»РµР№ Р·Р°РїРёСЃР°Р»РёСЃСЊ СЃРµРіРѕРґРЅСЏ
+          Уже <span id="twostep-leads-count"></span> родителей записались сегодня
         </div>
       `;
     container
@@ -268,7 +268,7 @@
     document
       .getElementById('twostepForm1')
       .addEventListener('submit', onStep1Submit);
-    // РћР±РЅРѕРІРёС‚СЊ social proof
+    // Обновить social proof
     const leadsCount = getLeadsCountToday();
     const leadsCountEl = document.getElementById('twostep-leads-count');
     if (leadsCountEl) leadsCountEl.textContent = leadsCount;
@@ -306,31 +306,31 @@
     const submitBtn = form.querySelector('.twostep-submit');
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = 'РћС‚РїСЂР°РІР»СЏРµРј...';
+      submitBtn.textContent = 'Отправляем...';
     }
     const phone = form.phone.value.trim();
     if (!validatePhone(phone)) {
       showMessage1(
-        'Р’РІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР° (РјРµР¶РґСѓРЅР°СЂРѕРґРЅС‹Р№ С„РѕСЂРјР°С‚)',
+        'Введите корректный номер телефона (международный формат)',
         'error'
       );
       form.phone.classList.add('error');
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent =
-          'Р—Р°РїРёСЃР°С‚СЊСЃСЏ РЅР° РїСЂРѕР±РЅС‹Р№ СѓСЂРѕРє';
+          'Записаться на пробный урок';
       }
       return;
     }
     form.phone.classList.remove('error');
     showMessage1('', '');
-    // РЎРѕС…СЂР°РЅСЏРµРј С‚РµР»РµС„РѕРЅ Рё РёРЅС„Рѕ
+    // Сохраняем телефон и инфо
     savedPhone = phone;
     savedPage = window.location.href;
     savedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const roistat_visit = getRoistatVisit();
     const fbclid = getFbclid();
-    // РћС‚РїСЂР°РІР»СЏРµРј РїРµСЂРІС‹Р№ СЌС‚Р°Рї (С‚РѕР»СЊРєРѕ С‚РµР»РµС„РѕРЅ, СЃС‚СЂР°РЅРёС†Р°, С‚Р°Р№РјР·РѕРЅР°, roistat_visit, fbclid)
+    // Отправляем первый этап (только телефон, страница, таймзона, roistat_visit, fbclid)
     const result = await sendWebhook({
       popupId: CONFIG.popupId,
       phone: phone,
@@ -344,11 +344,11 @@
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent =
-          'Р—Р°РїРёСЃР°С‚СЊСЃСЏ РЅР° РїСЂРѕР±РЅС‹Р№ СѓСЂРѕРє';
+          'Записаться на пробный урок';
       }
       return;
     }
-    // РџРµСЂРµС…РѕРґРёРј РєРѕ РІС‚РѕСЂРѕРјСѓ СЌС‚Р°РїСѓ С‚РѕР»СЊРєРѕ РµСЃР»Рё РІСЃС‘ РѕРє
+    // Переходим ко второму этапу только если всё ок
     renderStep2();
   }
 
@@ -357,34 +357,34 @@
     const container = document.getElementById('twostepFormContainer');
     if (!container) return;
     container.innerHTML = `
-        <button class="twostep-close" type="button" aria-label="Р—Р°РєСЂС‹С‚СЊ">&times;</button>
-        <div class="twostep-title">РџР°СЂСѓ СѓС‚РѕС‡РЅСЏСЋС‰РёС… РІРѕРїСЂРѕСЃРѕРІ</div>
+        <button class="twostep-close" type="button" aria-label="Закрыть">&times;</button>
+        <div class="twostep-title">Пару уточняющих вопросов</div>
         <div class="twostep-message" id="twostepMessage2"></div>
         <form id="twostepForm2" autocomplete="off">
           <div class="twostep-field">
-            <label for="twostep-name" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">Р’Р°С€Рµ РёРјСЏ</label>
-            <input id="twostep-name" type="text" class="twostep-input" name="name" required placeholder="Р’РІРµРґРёС‚Рµ РёРјСЏ">
+            <label for="twostep-name" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">Ваше имя</label>
+            <input id="twostep-name" type="text" class="twostep-input" name="name" required placeholder="Введите имя">
           </div>
           <div class="twostep-field">
-            <label for="twostep-email" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">Email РґР»СЏ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ</label>
-            <input id="twostep-email" type="email" class="twostep-input" name="email" required placeholder="Р’РІРµРґРёС‚Рµ email">
+            <label for="twostep-email" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">Email для подтверждения</label>
+            <input id="twostep-email" type="email" class="twostep-input" name="email" required placeholder="Введите email">
           </div>
           <div class="twostep-field">
-            <label for="twostep-age" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">РЎРєРѕР»СЊРєРѕ Р»РµС‚ СЂРµР±С‘РЅРєСѓ?</label>
-            <input id="twostep-age" type="number" class="twostep-input" name="child_age" required min="1" max="25" placeholder="Р’РѕР·СЂР°СЃС‚ СЂРµР±С‘РЅРєР°">
+            <label for="twostep-age" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">Сколько лет ребёнку?</label>
+            <input id="twostep-age" type="number" class="twostep-input" name="child_age" required min="1" max="25" placeholder="Возраст ребёнка">
           </div>
           <div class="twostep-field">
-            <label for="twostep-calltime" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">РљРѕРіРґР° РІР°Рј СѓРґРѕР±РЅРѕ РїРѕРіРѕРІРѕСЂРёС‚СЊ?</label>
+            <label for="twostep-calltime" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">Когда вам удобно поговорить?</label>
             <select id="twostep-calltime" class="twostep-input" name="call_time" required style="width:100%">
-              <option value="" disabled selected>Р’С‹Р±РµСЂРёС‚Рµ РІСЂРµРјСЏ</option>
-              <option value="9:00вЂ“12:00">9:00вЂ“12:00</option>
-              <option value="12:00вЂ“15:00">12:00вЂ“15:00</option>
-              <option value="15:00вЂ“18:00">15:00вЂ“18:00</option>
-              <option value="18:00вЂ“21:00">18:00вЂ“21:00</option>
-              <option value="Р’ Р»СЋР±РѕРµ РІСЂРµРјСЏ">Р’ Р»СЋР±РѕРµ РІСЂРµРјСЏ</option>
+              <option value="" disabled selected>Выберите время</option>
+              <option value="9:00–12:00">9:00–12:00</option>
+              <option value="12:00–15:00">12:00–15:00</option>
+              <option value="15:00–18:00">15:00–18:00</option>
+              <option value="18:00–21:00">18:00–21:00</option>
+              <option value="В любое время">В любое время</option>
             </select>
           </div>
-          <button type="submit" class="twostep-submit">Р—Р°РІРµСЂС€РёС‚СЊ Р·Р°РїРёСЃСЊ</button>
+          <button type="submit" class="twostep-submit">Завершить запись</button>
         </form>
       `;
     container
@@ -409,7 +409,7 @@
     const submitBtn = form.querySelector('.twostep-submit');
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = 'РћС‚РїСЂР°РІР»СЏРµРј...';
+      submitBtn.textContent = 'Отправляем...';
     }
     const name = form.name.value.trim();
     const email = form.email.value.trim();
@@ -417,18 +417,18 @@
     const call_time = form.call_time.value.trim();
     let hasError = false;
     if (!name) {
-      showMessage2('Р’РІРµРґРёС‚Рµ РёРјСЏ', 'error');
+      showMessage2('Введите имя', 'error');
       form.name.classList.add('error');
       hasError = true;
     }
     if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      showMessage2('Р’РІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ email', 'error');
+      showMessage2('Введите корректный email', 'error');
       form.email.classList.add('error');
       hasError = true;
     }
     if (!child_age || isNaN(child_age) || child_age < 1 || child_age > 25) {
       showMessage2(
-        'Р’РІРµРґРёС‚Рµ РІРѕР·СЂР°СЃС‚ СЂРµР±РµРЅРєР° РѕС‚ 1 РґРѕ 25',
+        'Введите возраст ребенка от 1 до 25',
         'error'
       );
       form.child_age.classList.add('error');
@@ -436,7 +436,7 @@
     }
     if (!call_time) {
       showMessage2(
-        'Р’С‹Р±РµСЂРёС‚Рµ СѓРґРѕР±РЅРѕРµ РІСЂРµРјСЏ РґР»СЏ Р·РІРѕРЅРєР°',
+        'Выберите удобное время для звонка',
         'error'
       );
       form.call_time.classList.add('error');
@@ -445,7 +445,7 @@
     if (hasError) {
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Р—Р°РІРµСЂС€РёС‚СЊ Р·Р°РїРёСЃСЊ';
+        submitBtn.textContent = 'Завершить запись';
       }
       return;
     }
@@ -456,9 +456,9 @@
     showMessage2('', '');
     const roistat_visit = getRoistatVisit();
     const fbclid = getFbclid();
-    // Р¤РѕСЂРјРёСЂСѓРµРј comment
-    const comment = `Р’РѕР·СЂР°СЃС‚ СЂРµР±С‘РЅРєР°: ${child_age}, РЈРґРѕР±РЅРѕРµ РІСЂРµРјСЏ РґР»СЏ Р·РІРѕРЅРєР°: ${call_time}, Р§Р°СЃРѕРІРѕР№ РїРѕСЏСЃ: ${savedTimezone}`;
-    // Р›РѕРіРёСЂСѓРµРј РѕС‚РїСЂР°РІР»СЏРµРјС‹Рµ РґР°РЅРЅС‹Рµ
+    // Формируем comment
+    const comment = `Возраст ребёнка: ${child_age}, Удобное время для звонка: ${call_time}, Часовой пояс: ${savedTimezone}`;
+    // Логируем отправляемые данные
     const dataToSend = {
       popupId: CONFIG.popupId,
       phone: savedPhone,
@@ -473,20 +473,20 @@
       fbclid: fbclid
     };
     console.log(
-      '[popup2.js] РћС‚РїСЂР°РІРєР° РґР°РЅРЅС‹С… РІС‚РѕСЂРѕРіРѕ СЌС‚Р°РїР°:',
+      '[popup2.js] Отправка данных второго этапа:',
       dataToSend
     );
-    // РћС‚РїСЂР°РІР»СЏРµРј РІС‚РѕСЂРѕР№ СЌС‚Р°Рї (РІСЃРµ РїРѕР»СЏ)
+    // Отправляем второй этап (все поля)
     const result = await sendWebhook(dataToSend);
     if (!result.success) {
       showMessage2(result.error, 'error');
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Р—Р°РІРµСЂС€РёС‚СЊ Р·Р°РїРёСЃСЊ';
+        submitBtn.textContent = 'Завершить запись';
       }
       return;
     }
-    // РџРѕРєР°Р·С‹РІР°РµРј СѓСЃРїРµС…
+    // Показываем успех
     renderSuccess();
   }
 
@@ -495,10 +495,10 @@
     if (!container) return;
     container.innerHTML = `
         <div class="twostep-success-block">
-          <div class="twostep-success-thank" style="color:#27ae60;font-size:22px;font-weight:800;margin-top:10px;margin-bottom:8px;">Р—Р°СЏРІРєР° РїСЂРёРЅСЏС‚Р°!</div>
-          <div class="twostep-success-desc" style="margin-bottom:10px;color:#444;font-size:16px;">РњРµРЅРµРґР¶РµСЂ СЃРєРѕСЂРѕ СЃРІСЏР¶РµС‚СЃСЏ СЃ РІР°РјРё.</div>
-          <div style="font-size:15px;color:#222;margin-bottom:10px;">РњС‹ РїРѕР·РІРѕРЅРёРј РІР°Рј РЅР° РЅРѕРјРµСЂ:<br><b>${savedPhone}</b></div>
-          <div style="font-size:15px;color:#222;margin-bottom:10px;">Р’С‹ С‚Р°РєР¶Рµ РјРѕР¶РµС‚Рµ РЅР°РїРёСЃР°С‚СЊ РЅР°Рј РїСЂСЏРјРѕ СЃРµР№С‡Р°СЃ:</div>
+          <div class="twostep-success-thank" style="color:#27ae60;font-size:22px;font-weight:800;margin-top:10px;margin-bottom:8px;">Заявка принята!</div>
+          <div class="twostep-success-desc" style="margin-bottom:10px;color:#444;font-size:16px;">Менеджер скоро свяжется с вами.</div>
+          <div style="font-size:15px;color:#222;margin-bottom:10px;">Мы позвоним вам на номер:<br><b>${savedPhone}</b></div>
+          <div style="font-size:15px;color:#222;margin-bottom:10px;">Вы также можете написать нам прямо сейчас:</div>
           <div style="display:flex;gap:12px;justify-content:center;margin-bottom:18px;">
             <a href="https://t.me/schoolprogkids" target="_blank" class="messenger-btn messenger-telegram">
               <span class="messenger-icon"> <svg width="20" height="20" viewBox="0 0 240 240" fill="none"><circle cx="120" cy="120" r="120" fill="#229ED9"/><path d="M180 72L60 120l36 12 12 36 18-24 30 24 24-96z" fill="#fff"/></svg> </span>
@@ -510,7 +510,7 @@
             </a>
           </div>
         </div>
-        <button class="twostep-submit" onclick="window.location.reload()">Р—Р°РєСЂС‹С‚СЊ</button>
+        <button class="twostep-submit" onclick="window.location.reload()">Закрыть</button>
         <style>
           .messenger-btn {
             display: flex;
@@ -557,7 +557,7 @@
     createOverlay();
     createModal();
     loadLibPhoneNumber(() => {});
-    // Р”РµР»Р°РµРј showModal РіР»РѕР±Р°Р»СЊРЅРѕР№ РґР»СЏ РІС‹Р·РѕРІР° РёР· Webflow
+    // Делаем showModal глобальной для вызова из Webflow
     window.openTrialPopup = showModal;
   }
 

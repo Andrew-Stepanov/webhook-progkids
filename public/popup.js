@@ -4,7 +4,7 @@
   // Configuration
   const CONFIG = {
     popupId: 'call-me-button',
-    serverUrl: 'https://popup.progkids.com', // <-- С„РёРєСЃРёСЂСѓРµРј Р°РґСЂРµСЃ
+    serverUrl: 'https://popup.progkids.com', // <-- фиксируем адрес
     buttonColor: '#007bff',
     position: 'bottom-left'
   };
@@ -530,7 +530,7 @@
     document.head.appendChild(style);
   }
 
-  // РџРѕРґРєР»СЋС‡РµРЅРёРµ libphonenumber-js Р»РѕРєР°Р»СЊРЅРѕ
+  // Подключение libphonenumber-js локально
   function loadLibPhoneNumber(callback) {
     if (window.libphonenumber) return callback();
     const script = document.createElement('script');
@@ -538,7 +538,7 @@
     script.onload = callback;
     script.onerror = () => {
       console.error(
-        '[Callback Popup] РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ libphonenumber-js Р»РѕРєР°Р»СЊРЅРѕ'
+        '[Callback Popup] Не удалось загрузить libphonenumber-js локально'
       );
     };
     document.body.appendChild(script);
@@ -560,14 +560,14 @@
     labelBtn.type = 'button';
     labelBtn.className = 'callback-button-label';
     labelBtn.innerHTML =
-      '<span>Р—Р°РєР°Р·Р°С‚СЊ</span><span>Р·РІРѕРЅРѕРє</span>';
+      '<span>Заказать</span><span>звонок</span>';
     labelBtn.addEventListener('click', showModal);
     wrapper.appendChild(button);
     wrapper.appendChild(labelBtn);
     document.body.appendChild(wrapper);
   }
 
-  // Р’СЃС‚Р°РІР»СЏСЋ livefeed-РєРѕРЅС‚РµР№РЅРµСЂ РІ body, Р° РЅРµ РІ РїРѕРїР°Рї
+  // Вставляю livefeed-контейнер в body, а не в попап
   function createLiveFeedContainer() {
     if (document.getElementById('callbackLiveFeed')) return;
     const liveFeed = document.createElement('div');
@@ -578,14 +578,14 @@
 
   // Create modal
   function createModal() {
-    if (document.querySelector('.callback-modal')) return; // РќРµ СЃРѕР·РґР°РІР°С‚СЊ РїРѕРІС‚РѕСЂРЅРѕ
+    if (document.querySelector('.callback-modal')) return; // Не создавать повторно
     const modal = document.createElement('div');
     modal.className = 'callback-modal';
     modal.innerHTML = `
         <div class="callback-form">
-          <button class="callback-close" type="button" aria-label="Р—Р°РєСЂС‹С‚СЊ">&times;</button>
-          <div class="callback-title">РћСЃС‚Р°РІСЊС‚Рµ РЅРѕРјРµСЂ вЂ” РјС‹ РїРµСЂРµР·РІРѕРЅРёРј!</div>
-          <div class="callback-subtitle">РЎРІСЏР¶РµРјСЃСЏ СЃ РІР°РјРё РІ С‚РµС‡РµРЅРёРµ 5 РјРёРЅСѓС‚</div>
+          <button class="callback-close" type="button" aria-label="Закрыть">&times;</button>
+          <div class="callback-title">Оставьте номер — мы перезвоним!</div>
+          <div class="callback-subtitle">Свяжемся с вами в течение 5 минут</div>
           <div class="callback-message" id="callbackMessage" style="display: none;"></div>
           <form id="callbackForm" autocomplete="off">
             <div class="callback-field">
@@ -594,22 +594,22 @@
             </div>
             <button type="submit" class="callback-submit">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#fff"/><path d="M6.5 10.5L9 13L14 8" stroke="#27ae60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span>Р–РґСѓ Р·РІРѕРЅРєР°</span>
+              <span>Жду звонка</span>
             </button>
           </form>
-          <div class="callback-social-proof-min">РЈР¶Рµ 124 РєР»РёРµРЅС‚Р° РїРѕР»СѓС‡РёР»Рё РєРѕРЅСЃСѓР»СЊС‚Р°С†РёСЋ СЃРµРіРѕРґРЅСЏ</div>
+          <div class="callback-social-proof-min">Уже 124 клиента получили консультацию сегодня</div>
           <div class="callback-privacy">
             <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10 2C6.13 2 3 5.13 3 9v3.28c0 .53-.21 1.04-.59 1.41l-1.7 1.7A1 1 0 003 17h14a1 1 0 00.71-1.71l-1.7-1.7a2 2 0 01-.59-1.41V9c0-3.87-3.13-7-7-7zm0 2a5 5 0 015 5v3.28c0 1.06.42 2.08 1.17 2.83l.29.29H3.54l.29-.29A4.01 4.01 0 005 10.28V9a5 5 0 015-5zm0 10a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
-            РњС‹ Р·Р°Р±РѕС‚РёРјСЃСЏ Рѕ РІР°С€РёС… РґР°РЅРЅС‹С…. РћС‚РїСЂР°РІР»СЏСЏ С„РѕСЂРјСѓ, РІС‹ РїСЂРёРЅРёРјР°РµС‚Рµ СѓСЃР»РѕРІРёСЏ РџРѕР»РёС‚РёРєРё РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚Рё.
+            Мы заботимся о ваших данных. Отправляя форму, вы принимаете условия Политики конфиденциальности.
           </div>
         </div>
       `;
     document.body.appendChild(modal);
     modal.querySelector('.callback-close').addEventListener('click', hideModal);
-    // РџРѕРґРєР»СЋС‡Р°РµРј libphonenumber-js
+    // Подключаем libphonenumber-js
     loadLibPhoneNumber(() => {
       console.log(
-        '[Callback Popup] libphonenumber-js РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°РЅ'
+        '[Callback Popup] libphonenumber-js инициализирован'
       );
     });
     return modal;
@@ -673,16 +673,16 @@
   // Show message
   function showMessage(text, type = 'success') {
     const message = document.getElementById('callbackMessage');
-    if (!message) return; // РќРµ РїС‹С‚Р°С‚СЊСЃСЏ РјРµРЅСЏС‚СЊ innerHTML, РµСЃР»Рё СЌР»РµРјРµРЅС‚Р° РЅРµС‚
+    if (!message) return; // Не пытаться менять innerHTML, если элемента нет
     message.innerHTML = text;
     message.className = `callback-message ${type}`;
     message.style.display = 'block';
   }
 
-  // РЈРЅРёРІРµСЂСЃР°Р»СЊРЅР°СЏ РІР°Р»РёРґР°С†РёСЏ РЅРѕРјРµСЂР° РґР»СЏ РІСЃРµС… СЃС‚СЂР°РЅ
+  // Универсальная валидация номера для всех стран
   function validateForm(formData) {
     const errors = {};
-    // РўРѕР»СЊРєРѕ С‚РµР»РµС„РѕРЅ
+    // Только телефон
     if (window.libphonenumber) {
       try {
         const phoneUtil = window.libphonenumber.parsePhoneNumber(
@@ -690,11 +690,11 @@
         );
         if (!phoneUtil.isValid()) {
           errors.phone =
-            'Р’РІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР° (РјРµР¶РґСѓРЅР°СЂРѕРґРЅС‹Р№ С„РѕСЂРјР°С‚)';
+            'Введите корректный номер телефона (международный формат)';
         }
       } catch (e) {
         errors.phone =
-          'Р’РІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР° (РјРµР¶РґСѓРЅР°СЂРѕРґРЅС‹Р№ С„РѕСЂРјР°С‚)';
+          'Введите корректный номер телефона (международный формат)';
       }
     } else {
       if (
@@ -702,66 +702,66 @@
         formData.phone.replace(/\D/g, '').length < 8
       ) {
         errors.phone =
-          'Р’РІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР° (РјРµР¶РґСѓРЅР°СЂРѕРґРЅС‹Р№ С„РѕСЂРјР°С‚)';
+          'Введите корректный номер телефона (международный формат)';
       }
     }
     return errors;
   }
 
-  // Р¤СѓРЅРєС†РёСЏ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ roistat_visit
+  // Функция для получения roistat_visit
   function getRoistatVisit() {
-    // 1. РР· РєСѓРєРё
+    // 1. �?з куки
     const match = document.cookie.match(/(?:^|; )roistat_visit=([^;]*)/);
     if (match) return decodeURIComponent(match[1]);
-    // 2. РР· URL ?roistat=...
+    // 2. �?з URL ?roistat=...
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('roistat')) return urlParams.get('roistat');
-    // 3. РР· URL ?rs=...
+    // 3. �?з URL ?rs=...
     if (urlParams.get('rs')) return urlParams.get('rs');
     return '';
   }
 
-  // Р¤СѓРЅРєС†РёСЏ РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ fbclid
+  // Функция для получения fbclid
   function getFbclid() {
     try {
-      // 1. РР· URL РїР°СЂР°РјРµС‚СЂР° fbclid
+      // 1. �?з URL параметра fbclid
       const urlParams = new URLSearchParams(window.location.search);
       const fbclidFromQuery = urlParams.get('fbclid');
       if (fbclidFromQuery) {
         console.log(
-          '[FBCLID] РќР°Р№РґРµРЅ РІ query РїР°СЂР°РјРµС‚СЂР°С…:',
+          '[FBCLID] Найден в query параметрах:',
           fbclidFromQuery
         );
         return fbclidFromQuery;
       }
 
-      // 2. РР· URL РїР°СЂР°РјРµС‚СЂР° fbclid РІ hash
+      // 2. �?з URL параметра fbclid в hash
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const fbclidFromHash = hashParams.get('fbclid');
       if (fbclidFromHash) {
         console.log(
-          '[FBCLID] РќР°Р№РґРµРЅ РІ hash РїР°СЂР°РјРµС‚СЂР°С…:',
+          '[FBCLID] Найден в hash параметрах:',
           fbclidFromHash
         );
         return fbclidFromHash;
       }
 
-      // 3. РђР»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹Р№ СЃРїРѕСЃРѕР± - С‡РµСЂРµР· regex
+      // 3. Альтернативный способ - через regex
       const url = window.location.href;
       const fbclidMatch = url.match(/[?&]fbclid=([^&#]*)/);
       if (fbclidMatch && fbclidMatch[1]) {
-        console.log('[FBCLID] РќР°Р№РґРµРЅ С‡РµСЂРµР· regex:', fbclidMatch[1]);
+        console.log('[FBCLID] Найден через regex:', fbclidMatch[1]);
         return decodeURIComponent(fbclidMatch[1]);
       }
 
-      console.log('[FBCLID] РќРµ РЅР°Р№РґРµРЅ РІ URL');
-      console.log('[FBCLID] РўРµРєСѓС‰РёР№ URL:', window.location.href);
-      console.log('[FBCLID] Query РїР°СЂР°РјРµС‚СЂС‹:', window.location.search);
-      console.log('[FBCLID] Hash РїР°СЂР°РјРµС‚СЂС‹:', window.location.hash);
+      console.log('[FBCLID] Не найден в URL');
+      console.log('[FBCLID] Текущий URL:', window.location.href);
+      console.log('[FBCLID] Query параметры:', window.location.search);
+      console.log('[FBCLID] Hash параметры:', window.location.hash);
       return '';
     } catch (error) {
       console.error(
-        '[FBCLID] РћС€РёР±РєР° РїСЂРё РёР·РІР»РµС‡РµРЅРёРё fbclid:',
+        '[FBCLID] Ошибка при извлечении fbclid:',
         error
       );
       return '';
@@ -776,7 +776,7 @@
       const site_url = window.location.href;
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const fbclid = getFbclid();
-      console.log('[SUBMIT] РћС‚РїСЂР°РІР»СЏРµРј РґР°РЅРЅС‹Рµ:', {
+      console.log('[SUBMIT] Отправляем данные:', {
         phone,
         roistat_visit,
         site_url,
@@ -792,7 +792,7 @@
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.innerHTML =
-          '<span class="callback-spinner"></span> РћС‚РїСЂР°РІР»СЏРµРј...';
+          '<span class="callback-spinner"></span> Отправляем...';
       }
       const response = await fetch(`${CONFIG.serverUrl}/api/webhook`, {
         method: 'POST',
@@ -816,49 +816,49 @@
         if (typeof _tmr !== 'undefined')
           _tmr.push({ type: 'reachGoal', id: 3498335, goal: 'lead' });
         sendLeadEvent();
-        // РЎРєСЂС‹РІР°РµРј РїРѕР»Рµ Рё РєРЅРѕРїРєСѓ, РїРѕРєР°Р·С‹РІР°РµРј РєСЂР°СЃРёРІС‹Р№ Р±Р»РѕРє СѓСЃРїРµС…Р°
+        // Скрываем поле и кнопку, показываем красивый блок успеха
         if (phoneField) phoneField.style.display = 'none';
         if (submitBtn) submitBtn.style.display = 'none';
-        // РЎРєСЂС‹РІР°РµРј Р·Р°РіРѕР»РѕРІРѕРє Рё social proof
+        // Скрываем заголовок и social proof
         const title = document.querySelector('.callback-title');
         if (title) title.style.display = 'none';
         const socialProof = document.querySelector(
           '.callback-social-proof-min'
         );
         if (socialProof) socialProof.style.display = 'none';
-        // РЈРґР°Р»СЏРµРј СЃС‚Р°СЂС‹Р№ Р±Р»РѕРє СѓСЃРїРµС…Р°, РµСЃР»Рё РµСЃС‚СЊ
+        // Удаляем старый блок успеха, если есть
         let successBlock = document.querySelector('.callback-success-block');
         if (successBlock) successBlock.remove();
-        // РЎРѕР·РґР°С‘Рј РЅРѕРІС‹Р№ Р±Р»РѕРє СѓСЃРїРµС…Р°
+        // Создаём новый блок успеха
         successBlock = document.createElement('div');
         successBlock.className = 'callback-success-block';
         successBlock.innerHTML = `
-            <div class="callback-success-thank">РЎРїР°СЃРёР±Рѕ!</div>
-            <div class="callback-success-desc">РњС‹ СѓР¶Рµ РЅР°Р±РёСЂР°РµРј РІР°С€ РЅРѕРјРµСЂ:</div>
+            <div class="callback-success-thank">Спасибо!</div>
+            <div class="callback-success-desc">Мы уже набираем ваш номер:</div>
             <div class="callback-success-phone">${phone}</div>
-            <button type="button" class="callback-reset-btn" style="margin-top: 10px; padding: 8px 18px; background: #f3f3f3; color: #27ae60; border: 1.5px solid #27ae60; border-radius: 7px; font-size: 15px; font-weight: 600; cursor: pointer;">РћС€РёР±СЃСЏ РЅРѕРјРµСЂРѕРј</button>
+            <button type="button" class="callback-reset-btn" style="margin-top: 10px; padding: 8px 18px; background: #f3f3f3; color: #27ae60; border: 1.5px solid #27ae60; border-radius: 7px; font-size: 15px; font-weight: 600; cursor: pointer;">Ошибся номером</button>
           `;
-        // Р’СЃС‚Р°РІР»СЏРµРј Р±Р»РѕРє РїРѕСЃР»Рµ С„РѕСЂРјС‹
+        // Вставляем блок после формы
         form.parentNode.insertBefore(successBlock, form.nextSibling);
-        // Р”РѕР±Р°РІР»СЏРµРј РѕР±СЂР°Р±РѕС‚С‡РёРє РЅР° РєРЅРѕРїРєСѓ СЃР±СЂРѕСЃР°
+        // Добавляем обработчик на кнопку сброса
         const resetBtn = successBlock.querySelector('.callback-reset-btn');
         if (resetBtn) {
           resetBtn.addEventListener('click', function () {
-            // РЎР±СЂРѕСЃРёС‚СЊ С„РѕСЂРјСѓ Рё РїРѕРєР°Р·Р°С‚СЊ СЃРЅРѕРІР° РїРѕР»СЏ
+            // Сбросить форму и показать снова поля
             successBlock.remove();
             if (phoneField) phoneField.style.display = '';
             if (submitBtn) submitBtn.style.display = '';
             if (title) title.style.display = '';
             if (socialProof) socialProof.style.display = '';
             form.reset();
-            // РЎР±СЂРѕСЃ РѕС€РёР±РѕРє
+            // Сброс ошибок
             form
               .querySelectorAll('.callback-input')
               .forEach((input) => input.classList.remove('error'));
             document.querySelectorAll('.callback-error').forEach((error) => {
               error.style.display = 'none';
             });
-            // РЎС„РѕРєСѓСЃРёСЂРѕРІР°С‚СЊ РЅР° РїРѕР»Рµ С‚РµР»РµС„РѕРЅР°
+            // Сфокусировать на поле телефона
             const phoneInput = form.querySelector(
               '.callback-input[name="phone"]'
             );
@@ -867,41 +867,41 @@
         }
       } else {
         showMessage(
-          result.error || 'РћС€РёР±РєР° РѕС‚РїСЂР°РІРєРё Р·Р°СЏРІРєРё',
+          result.error || 'Ошибка отправки заявки',
           'error'
         );
-        // РџРѕРєР°Р·С‹РІР°РµРј РїРѕР»СЏ РѕР±СЂР°С‚РЅРѕ
+        // Показываем поля обратно
         if (phoneField) phoneField.style.display = '';
         if (submitBtn) submitBtn.style.display = '';
-        // РЎРєСЂС‹РІР°РµРј Р±Р»РѕРє СѓСЃРїРµС…Р°
+        // Скрываем блок успеха
         let successBlock = document.querySelector('.callback-success-block');
         if (successBlock) successBlock.style.display = 'none';
       }
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.innerHTML =
-          '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#fff"/><path d="M6.5 10.5L9 13L14 8" stroke="#27ae60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>Р–РґСѓ Р·РІРѕРЅРєР°</span>';
+          '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#fff"/><path d="M6.5 10.5L9 13L14 8" stroke="#27ae60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>Жду звонка</span>';
       }
     } catch (error) {
       console.error('Form submission error:', error);
       showMessage(
-        'РћС€РёР±РєР° РѕС‚РїСЂР°РІРєРё Р·Р°СЏРІРєРё. РџРѕРїСЂРѕР±СѓР№С‚Рµ РїРѕР·Р¶Рµ.',
+        'Ошибка отправки заявки. Попробуйте позже.',
         'error'
       );
       const submitBtn = document.querySelector('.callback-submit');
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.innerHTML =
-          '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#fff"/><path d="M6.5 10.5L9 13L14 8" stroke="#27ae60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>Р–РґСѓ Р·РІРѕРЅРєР°</span>';
+          '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="#fff"/><path d="M6.5 10.5L9 13L14 8" stroke="#27ae60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>Жду звонка</span>';
       }
-      // РџРѕРєР°Р·С‹РІР°РµРј РїРѕР»СЏ РѕР±СЂР°С‚РЅРѕ
+      // Показываем поля обратно
       const phoneField = document
         .querySelector('.callback-input[name="phone"]')
         ?.closest('.callback-field');
       if (phoneField) phoneField.style.display = '';
       const submitBtn2 = document.querySelector('.callback-submit');
       if (submitBtn2) submitBtn2.style.display = '';
-      // РЎРєСЂС‹РІР°РµРј Р±Р»РѕРє СѓСЃРїРµС…Р°
+      // Скрываем блок успеха
       let successBlock = document.querySelector('.callback-success-block');
       if (successBlock) successBlock.style.display = 'none';
     }
@@ -929,7 +929,7 @@
         // Validate
         const errors = validateForm(data);
 
-        // РЎР±СЂРѕСЃ РѕС€РёР±РѕРє
+        // Сброс ошибок
         e.target
           .querySelectorAll('.callback-input')
           .forEach((input) => input.classList.remove('error'));
@@ -947,7 +947,7 @@
             errorDiv.textContent = errors[field];
             errorDiv.style.display = 'block';
           });
-          // Р‘Р»РѕРєРёСЂСѓРµРј РєРЅРѕРїРєСѓ РЅР° 1 СЃРµРє, С‡С‚РѕР±С‹ РёР·Р±РµР¶Р°С‚СЊ СЃРїР°РјР°
+          // Блокируем кнопку на 1 сек, чтобы избежать спама
           const submitBtn = e.target.querySelector('.callback-submit');
           submitBtn.disabled = true;
           setTimeout(() => {
@@ -979,7 +979,7 @@
   // Make hideModal globally available
   window.hideModal = hideModal;
 
-  // Р¤РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµ РЅРѕРјРµСЂР° РїСЂРё РїРѕС‚РµСЂРµ С„РѕРєСѓСЃР°
+  // Форматирование номера при потере фокуса
   document.addEventListener(
     'blur',
     function (e) {
@@ -995,16 +995,16 @@
     true
   );
 
-  // Р¤РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµ РЅРѕРјРµСЂР° РїСЂРё РІРІРѕРґРµ (input)
+  // Форматирование номера при вводе (input)
   document.addEventListener(
     'input',
     function (e) {
       if (e.target && e.target.name === 'phone') {
-        // Р•СЃР»Рё РїРµСЂРІС‹Р№ СЃРёРјРІРѕР» РЅРµ "+" Рё РІРІРµРґРµРЅР° С†РёС„СЂР° вЂ” РґРѕР±Р°РІР»СЏРµРј "+"
+        // Если первый символ не "+" и введена цифра — добавляем "+"
         if (/^\d/.test(e.target.value)) {
           e.target.value = '+' + e.target.value;
         }
-        // Р•СЃР»Рё РЅРѕРјРµСЂ РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ +89, Р·Р°РјРµРЅСЏРµРј РЅР° +79
+        // Если номер начинается с +89, заменяем на +79
         if (/^\+89/.test(e.target.value)) {
           e.target.value = e.target.value.replace(/^\+89/, '+79');
         }
@@ -1021,7 +1021,7 @@
     true
   );
 
-  // Livefeed: Р°РЅРѕРЅРёРјРЅС‹Рµ РјРµР¶РґСѓРЅР°СЂРѕРґРЅС‹Рµ РЅРѕРјРµСЂР°, С‡Р°С‰Рµ
+  // Livefeed: анонимные международные номера, чаще
   function startLiveFeed() {
     const numbers = [
       '+49 *** *** 12-34',
@@ -1051,7 +1051,7 @@
       const number = numbers[Math.floor(Math.random() * numbers.length)];
       const msg = document.createElement('div');
       msg.className = 'callback-livefeed-msg';
-      msg.innerHTML = `<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#27ae60"/><path d="M8 12.5l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> ${number} С‚РѕР»СЊРєРѕ С‡С‚Рѕ РѕСЃС‚Р°РІРёР»(Р°) Р·Р°СЏРІРєСѓ`;
+      msg.innerHTML = `<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#27ae60"/><path d="M8 12.5l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> ${number} только что оставил(а) заявку`;
       liveFeed.appendChild(msg);
       setTimeout(() => {
         msg.remove();
@@ -1061,7 +1061,7 @@
       if (document.querySelector('.callback-modal.show')) {
         showMsg();
       }
-    }, Math.floor(6000 + Math.random() * 14000)); // РєР°Р¶РґС‹Рµ 6-10 СЃРµРєСѓРЅРґ
+    }, Math.floor(6000 + Math.random() * 14000)); // каждые 6-10 секунд
   }
 
   // Start when DOM is ready
