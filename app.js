@@ -12,6 +12,8 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(express.static('public'));
+
 // Замените этими значениями настройки своего webhook-получателя
 const webhookReceiverUrl = process.env.WEBHOOK_RECEIVER_URL;
 
