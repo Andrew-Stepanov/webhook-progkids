@@ -103,6 +103,10 @@
 
   // Универсальная функция отправки webhook
   async function sendWebhook(data) {
+    var cookies = window.parseCookies();
+    if (cookies.admitad_uid) data.admitad_uid = cookies.admitad_uid;
+    if (cookies.salid) data.salid = cookies.salid;
+
     try {
       const response = await fetch(`${CONFIG.serverUrl}/api/webhook`, {
         method: 'POST',
