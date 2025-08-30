@@ -64,7 +64,20 @@ function sendAnalyticsEvents() {
     _tmr.push({ type: 'reachGoal', id: 3498335, goal: 'lead' });
 }
 
+function parseCookies() {
+  var cookies = {};
+  var items = document.cookie.split(';');
+  for (var i = 0; i < items.length; i++) {
+    var parts = items[i].trim().split('=');
+    var key = parts[0];
+    var value = parts.slice(1).join('=');
+    cookies[key] = value;
+  }
+  return cookies;
+}
+
 window.sendLeadEvent = sendLeadEvent;
 window.getRoistatVisit = getRoistatVisit;
 window.getFbclid = getFbclid;
 window.sendAnalyticsEvents = sendAnalyticsEvents;
+window.parseCookies = parseCookies;
