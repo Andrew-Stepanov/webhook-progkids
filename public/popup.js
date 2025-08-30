@@ -4,9 +4,7 @@
   // Configuration
   const CONFIG = {
     popupId: 'call-me-button',
-    serverUrl: 'https://popup.progkids.com', // <-- фиксируем адрес
-    buttonColor: '#007bff',
-    position: 'bottom-left'
+    serverUrl: 'https://popup.progkids.com' // <-- фиксируем адрес
   };
 
   // CSS styles

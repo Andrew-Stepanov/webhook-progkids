@@ -4,9 +4,7 @@
   // Конфиг для нового попапа
   const CONFIG = {
     popupId: 'call-me-2step', // Новый уникальный popupId для двухэтапного попапа
-    serverUrl: 'https://popup.progkids.com',
-    buttonColor: '#007bff',
-    position: 'bottom-right'
+    serverUrl: 'https://popup.progkids.com'
   };
 
   // --- Стили (минимально для примера, можно доработать) ---
