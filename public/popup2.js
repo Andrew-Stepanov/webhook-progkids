@@ -4,7 +4,7 @@
   // Конфиг для нового попапа
   const CONFIG = {
     popupId: 'call-me-2step', // Новый уникальный popupId для двухэтапного попапа
-    serverUrl: 'https://popup.progkids.com'
+    serverUrl: 'https://webhook.progkids.com'
   };
 
   // --- Стили (минимально для примера, можно доработать) ---
@@ -108,7 +108,7 @@
     if (cookies.salid) data.salid = cookies.salid;
 
     try {
-      const response = await fetch(`${CONFIG.serverUrl}/api/webhook`, {
+      const response = await fetch(`${CONFIG.serverUrl}/webhook_v2`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)

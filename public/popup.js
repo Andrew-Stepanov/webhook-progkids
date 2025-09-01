@@ -4,7 +4,7 @@
   // Configuration
   const CONFIG = {
     popupId: 'call-me-button',
-    serverUrl: 'https://popup.progkids.com' // <-- фиксируем адрес
+    serverUrl: 'https://webhook.progkids.com' // <-- фиксируем адрес
   };
 
   // CSS styles
@@ -723,7 +723,7 @@
         submitBtn.innerHTML =
           '<span class="callback-spinner"></span> Отправляем...';
       }
-      const response = await fetch(`${CONFIG.serverUrl}/api/webhook`, {
+      const response = await fetch(`${CONFIG.serverUrl}/webhook_v2`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
