@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { generateUniqueOrderId, findRowsByEmail } = require('./utils');
 
-const logDir = path.join(__dirname, 'logs', 'test');
+const logDir = path.join(__dirname, 'logs');
 const logPath = path.join(logDir, 'salid.csv');
 
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });

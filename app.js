@@ -18,22 +18,23 @@ app.use(express.static('public'));
 const webhookReceiverUrl = process.env.WEBHOOK_RECEIVER_URL;
 
 function transformData(data) {
+  const subdata = data.data || {};
   const transformedData = {
     title: data.title || "Webflow", // Замените на нужное значение или сформируйте из входящих данных
-    admitad_uid: data.data.admitad_uid,
-    salid: data.data.salid,
-    name: data.data.name,
-    email: data.data.email,
-    phone: data.data.phone_full || data.data.phone,
-    comment: data.data.page_url, // Замените на нужное значение или сформируйте из входящих данных
-    roistat_visit: data.data.roistat_visit,
+    admitad_uid: subdata.admitad_uid,
+    salid: subdata.salid,
+    name: subdata.name,
+    email: subdata.email,
+    phone: subdata.phone_full || subdata.phone,
+    comment: subdata.page_url, // Замените на нужное значение или сформируйте из входящих данных
+    roistat_visit: subdata.roistat_visit,
     fields: {
       site: data.site, // Замените на нужное значение или сформируйте из входящих данных
-      ip: data.data.user_ip,
-      country: data.data.user_time_zone,
-      time: data.data.submission_time,
-      ipCountry: data.data.user_country,
-      phone: data.data.phone, 
+      ip: subdata.user_ip,
+      country: subdata.user_time_zone,
+      time: subdata.submission_time,
+      ipCountry: subdata.user_country,
+      phone: subdata.phone, 
     },
   };
 
