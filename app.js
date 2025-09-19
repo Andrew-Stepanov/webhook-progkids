@@ -82,7 +82,7 @@ const processWebhook = async (transformedData, res) => {
       });
     }
 
-    res.sendStatus(200);
+    res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error sending webhook:", error.message);
     res.sendStatus(500);
