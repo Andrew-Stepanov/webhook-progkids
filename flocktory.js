@@ -15,12 +15,14 @@ const transformData = (lead) => ({
   }
 });
 
-const loadLeads = async () => {
+const loadLeads = async (site_id) => {
+  if (!token) return [];
+
   const now = Math.floor(new Date().getTime() / 1000);
   const { data } = await axios.get(FLOCKTORY_API_URL, {
     params: {
       token: process.env.FLOCKTORY_API_TOKEN,
-      site_id: 5443,
+      site_id,
       page: 1,
       per_page: 100,
       from: now - 60,
@@ -39,10 +41,16 @@ const sendLead = (lead) => {
 
 const scheduleFlocktory = () => {
   cron.schedule('* * * * *', async () => {
-    const leads = await loadLeads();
+    const [leads, leadsKz] = await Promise.all([
+      loadLeads(5443),
+      loadLeads(6667)
+    ]);
 
-    console.log('Loaded', leads.length, 'leads');
+    console.log('Loaded', leads.length, 'flocktory leads');
+    console.log('Loaded', leadsKz.length, 'flocktory kz leads');
+
     leads.forEach(sendLead);
+    leadsKz.forEach(sendLead);
   });
 };
 
