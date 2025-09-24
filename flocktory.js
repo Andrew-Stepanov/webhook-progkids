@@ -16,8 +16,6 @@ const transformData = (lead) => ({
 });
 
 const loadLeads = async (site_id) => {
-  if (!token) return [];
-
   const now = Math.floor(new Date().getTime() / 1000);
   const { data } = await axios.get(FLOCKTORY_API_URL, {
     params: {
