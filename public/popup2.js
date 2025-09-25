@@ -102,7 +102,7 @@
   let savedTimezone = '';
 
   // Универсальная функция отправки webhook
-  async function sendWebhook(data) {
+  async function sendWebhook(data, sendAnalyticsEvents) {
     var cookies = window.parseCookies();
     if (cookies.admitad_uid) data.admitad_uid = cookies.admitad_uid;
     if (cookies.salid) data.salid = cookies.salid;
@@ -124,8 +124,11 @@
         };
       }
 
-      window.sendAnalyticsEvents();
-      window.sendLeadEvent();
+      if (sendAnalyticsEvents) {
+        window.sendAnalyticsEvents();
+        window.sendLeadEvent();
+      }
+
       return { success: true };
     } catch (err) {
       return {
@@ -258,14 +261,17 @@
     const roistat_visit = window.getRoistatVisit();
     const fbclid = window.getFbclid();
     // Отправляем первый этап (только телефон, страница, таймзона, roistat_visit, fbclid)
-    const result = await sendWebhook({
-      popupId: CONFIG.popupId,
-      phone: phone,
-      site_url: savedPage,
-      timezone: savedTimezone,
-      roistat_visit: roistat_visit,
-      fbclid: fbclid
-    });
+    const result = await sendWebhook(
+      {
+        popupId: CONFIG.popupId,
+        phone: phone,
+        site_url: savedPage,
+        timezone: savedTimezone,
+        roistat_visit: roistat_visit,
+        fbclid: fbclid
+      },
+      true
+    );
     if (!result.success) {
       showMessage1(result.error, 'error');
       if (submitBtn) {
@@ -394,7 +400,7 @@
     };
     console.log('[popup2.js] Отправка данных второго этапа:', dataToSend);
     // Отправляем второй этап (все поля)
-    const result = await sendWebhook(dataToSend);
+    const result = await sendWebhook(dataToSend, false);
     if (!result.success) {
       showMessage2(result.error, 'error');
       if (submitBtn) {
