@@ -51,12 +51,15 @@ function transformData(data) {
       site: data.site, // Замените на нужное значение или сформируйте из входящих данных
       ip: subdata.user_ip,
       country: subdata.user_time_zone,
-      time: subdata.submission_time,
+      539859: subdata.submission_time,
       ipCountry: subdata.user_country,
       phone: subdata.phone, 
       302727: "{source}",
       539861: "{facebookClientId}",
-      fbclid: "{facebookClientId}"
+      fbclid: "{facebookClientId}",
+      540309: "{ip}",
+      540311: "{country}",
+      540313: "{city}"
     },
   };
 
@@ -120,7 +123,10 @@ app.post("/webhook_v2", async (req, res) => {
       timezone,
       fbclid,
       302727: "{source}",
-      539861: "{facebookClientId}"
+      539861: "{facebookClientId}",
+      540309: "{ip}",
+      540311: "{country}",
+      540313: "{city}"
     }
   }, res);
 });
