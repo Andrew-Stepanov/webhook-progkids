@@ -50,8 +50,8 @@ function transformData(data) {
     fields: {
       site: data.site, // Замените на нужное значение или сформируйте из входящих данных
       ip: subdata.user_ip,
-      country: subdata.user_time_zone,
-      539859: subdata.submission_time,
+      539859: subdata.user_time_zone,
+      time: subdata.submission_time,
       ipCountry: subdata.user_country,
       phone: subdata.phone, 
       302727: "{source}",
