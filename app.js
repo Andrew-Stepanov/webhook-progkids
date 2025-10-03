@@ -54,6 +54,9 @@ function transformData(data) {
       time: subdata.submission_time,
       ipCountry: subdata.user_country,
       phone: subdata.phone, 
+      302727: "{source}",
+      539861: "{facebookClientId}",
+      fbclid: "{facebookClientId}"
     },
   };
 
@@ -115,7 +118,9 @@ app.post("/webhook_v2", async (req, res) => {
       popup_label: label,
       site_url,
       timezone,
-      fbclid
+      fbclid,
+      302727: "{source}",
+      539861: "{facebookClientId}"
     }
   }, res);
 });
