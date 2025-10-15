@@ -4,12 +4,12 @@ const cron = require('node-cron');
 const FLOCKTORY_API_URL =
   'https://client.flocktory.com/v2/exchange/phone-leads';
 
-const transformData = (lead) => ({
+const transformData = (lead, visitPrefix) => ({
   title: 'Flocktory',
   name: lead.name,
   email: lead.email === 'xname@flocktory.com' ? undefined : lead.email,
   phone: lead.phone,
-  roistat_visit: `flocktory_${lead.campaign_id}`,
+  roistat_visit: `${visitPrefix}_${lead.campaign_id}`,
   fields: {
     created_at: lead.created_at
   }
@@ -32,9 +32,12 @@ const loadLeads = async (site_id) => {
   return data.data;
 };
 
-const sendLead = (lead) => {
-  console.log('Flocktory item', lead);
-  axios.post(process.env.WEBHOOK_RECEIVER_URL, transformData(lead));
+const sendLead = (lead, visitPrefix) => {
+  console.log('Flocktory item', visitPrefix, lead);
+  axios.post(
+    process.env.WEBHOOK_RECEIVER_URL,
+    transformData(lead, visitPrefix)
+  );
 };
 
 const scheduleFlocktory = () => {
@@ -47,8 +50,8 @@ const scheduleFlocktory = () => {
     console.log('Loaded', leads.length, 'flocktory leads');
     console.log('Loaded', leadsKz.length, 'flocktory kz leads');
 
-    leads.forEach(sendLead);
-    leadsKz.forEach(sendLead);
+    leads.forEach((x) => sendLead(x, 'flocktory'));
+    leadsKz.forEach((x) => sendLead(x, 'flocktorykz'));
   });
 };
 
