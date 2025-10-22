@@ -249,6 +249,7 @@ app.post("/typeform-webhook", async (req, res) => {
 app.post("/payment", checkAuth, async (req, res) => {
   const { email, sum } = req.body;
   sendSalidSellPostback(email, sum);
+  sendAdmitadSellPostback(email, sum);
   res.sendStatus(200);
 });
 
@@ -259,8 +260,6 @@ app.post("/trial", checkAuth, async (req, res) => {
 });
 
 app.post("/trial-complete", checkAuth, async (req, res) => {
-  const { email } = req.body;
-  await sendAdmitadSellPostback(email);
   res.sendStatus(200);
 });
 

@@ -12,6 +12,14 @@ if (!fs.existsSync(logDir))
 if (!fs.existsSync(logPath))
   fs.writeFileSync(logPath, 'timestamp,admitad_uid,order_id,email,goal\n');
 
+const COMMON_QUERY_PARAMS = {
+  campaign_code: "3239143672",
+  postback: "1",
+  postback_key:
+    process.env.ADMITAD_POSTBACK_KEY,
+    tariff_code: "1",
+};
+
 async function sendAdmitadInitialPostback({ admitad_uid, email }) {
   if (!admitad_uid) {
     console.log("No admitad_uid");
@@ -21,7 +29,19 @@ async function sendAdmitadInitialPostback({ admitad_uid, email }) {
   const timestamp = new Date().toISOString();
   const order_id = generateUniqueOrderId();
 
+  const queryParams = new URLSearchParams({
+    ...COMMON_QUERY_PARAMS,
+    action_code: "3",
+    uid: admitad_uid,
+    order_id,
+    payment_type: "lead"
+  });
+
   try {
+    const response = await axios.get(
+      `https://ad.admitad.com/r?${queryParams.toString()}`
+    );
+
     const csvLine = `${timestamp},${admitad_uid},${order_id},${email},init\n`;
     fs.appendFileSync(logPath, csvLine);
   } catch (err) {
@@ -29,17 +49,14 @@ async function sendAdmitadInitialPostback({ admitad_uid, email }) {
   }
 }
 
-async function sendSellPostback({ admitad_uid, order_id, email }) {
+async function sendSellPostback({ admitad_uid, order_id, email, sum }) {
   const queryParams = new URLSearchParams({
-    campaign_code: "3239143672",
-    postback: "1",
-    postback_key:
-      process.env.ADMITAD_POSTBACK_KEY,
-    action_code: "1",
+    ...COMMON_QUERY_PARAMS,
+    action_code: "4",
     uid: admitad_uid,
     order_id,
-    tariff_code: "1",
-    payment_type: "sale"
+    payment_type: "sale",
+    price: sum
   });
 
   try {
@@ -57,7 +74,7 @@ async function sendSellPostback({ admitad_uid, order_id, email }) {
   }
 }
 
-async function sendAdmitadSellPostback(email) {
+async function sendAdmitadSellPostback(email, sum) {
   const rows = await findRowsByEmail(logPath, email);
 
   if (!rows.length) {
@@ -70,7 +87,11 @@ async function sendAdmitadSellPostback(email) {
     return;
   }
 
-  return await sendSellPostback(rows[rows.length - 1]);
+  return await sendSellPostback({
+    ...rows[rows.length - 1],
+    email,
+    sum,
+  });
 }
 
 module.exports = {
