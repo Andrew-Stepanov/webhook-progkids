@@ -184,6 +184,7 @@
             <label for="twostep-phone" style="font-size:15px;font-weight:500;display:block;margin-bottom:6px;">Ваш телефон</label>
             <input id="twostep-phone" type="text" class="twostep-input" name="phone" required autocomplete="off" maxlength="20" placeholder="+1 (999) 123-45-67">
           </div>
+          <div id="captcha-container" class="smart-captcha"></div>
           <button type="submit" class="twostep-submit">Записаться на пробный урок</button>
           <div style="font-size:12px;color:#888;text-align:center;margin-top:12px;line-height:1.5;">
             Отправляя заявку, вы соглашаетесь с <a href="/privacy-policy" target="_blank" style="color:#27ae60;text-decoration:underline;">политикой конфиденциальности</a>.
@@ -193,12 +194,37 @@
           Уже <span id="twostep-leads-count"></span> родителей записались сегодня
         </div>
       `;
+
+    let needSubmit = false;
+    let captchaWidgetId;
+    const form = document.getElementById('twostepForm1');
+
+    if (window.smartCaptcha) {
+      captchaWidgetId = window.smartCaptcha.render(
+        document.getElementById('captcha-container'),
+        {
+          sitekey: 'ysc1_yQJE2tBPlg54Rx63YcJ1AhTlWZdU9yZSEwEr8N0y783e8894',
+          callback: () => {
+            if (needSubmit) onStep1Submit(form);
+          }
+        }
+      );
+      form['smart-token'].required = true;
+    }
+
     container
       .querySelector('.twostep-close')
       .addEventListener('click', hideModal);
-    document
-      .getElementById('twostepForm1')
-      .addEventListener('submit', onStep1Submit);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (form['smart-token'].value) {
+        onStep1Submit(form);
+      } else {
+        needSubmit = true;
+        window.smartCaptcha.execute(captchaWidgetId);
+      }
+    });
     // Обновить social proof
     const leadsCount = getLeadsCountToday();
     const leadsCountEl = document.getElementById('twostep-leads-count');
@@ -231,9 +257,7 @@
     msg.style.display = 'block';
   }
 
-  async function onStep1Submit(e) {
-    e.preventDefault();
-    const form = e.target;
+  async function onStep1Submit(form) {
     const submitBtn = form.querySelector('.twostep-submit');
     if (submitBtn) {
       submitBtn.disabled = true;
