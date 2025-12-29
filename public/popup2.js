@@ -231,24 +231,6 @@
     if (leadsCountEl) leadsCountEl.textContent = leadsCount;
   }
 
-  function validatePhone(phone) {
-    if (window.libphonenumber) {
-      try {
-        const phoneUtil = window.libphonenumber.parsePhoneNumber(phone);
-        if (!phoneUtil.isValid()) return false;
-      } catch (e) {
-        return false;
-      }
-    } else {
-      if (
-        !/^\+[\d\s\-\(\)]+$/.test(phone) ||
-        phone.replace(/\D/g, '').length < 8
-      )
-        return false;
-    }
-    return true;
-  }
-
   function showMessage1(text, type = 'error') {
     const msg = document.getElementById('twostepMessage1');
     if (!msg) return;
@@ -264,7 +246,7 @@
       submitBtn.textContent = 'Отправляем...';
     }
     const phone = form.phone.value.trim();
-    if (!validatePhone(phone)) {
+    if (!window.validatePhone(phone)) {
       showMessage1(
         'Введите корректный номер телефона (международный формат)',
         'error'

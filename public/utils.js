@@ -76,8 +76,24 @@ function parseCookies() {
   return cookies;
 }
 
+function validatePhone(phone) {
+  if (window.libphonenumber) {
+    try {
+      const phoneUtil = window.libphonenumber.parsePhoneNumber(phone);
+      if (!phoneUtil.isValid()) return false;
+    } catch (e) {
+      return false;
+    }
+  } else {
+    if (!/^\+[\d\s\-\(\)]+$/.test(phone) || phone.replace(/\D/g, '').length < 8)
+      return false;
+  }
+  return true;
+}
+
 window.sendLeadEvent = sendLeadEvent;
 window.getRoistatVisit = getRoistatVisit;
 window.getFbclid = getFbclid;
 window.sendAnalyticsEvents = sendAnalyticsEvents;
 window.parseCookies = parseCookies;
+window.validatePhone = validatePhone;
