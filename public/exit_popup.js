@@ -111,6 +111,7 @@
     popup.style.minWidth = '280px';
     popup.style.textAlign = 'center';
     popup.style.position = 'relative';
+    popup.style.color = '#000';
 
     popup.innerHTML = ` 
     <button class="twostep-close" type="button" aria-label="Закрыть">&times;</button>
