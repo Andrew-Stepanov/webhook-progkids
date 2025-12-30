@@ -233,7 +233,7 @@
 
   const subscribe = () => {
     setTimeout(function () {
-      document.addEventListener('mouseleave', onExitIntent);
+      document.addEventListener('mouseout', onExitIntent);
     }, 300);
   };
 
