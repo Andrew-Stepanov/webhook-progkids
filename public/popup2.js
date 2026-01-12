@@ -129,7 +129,6 @@
         window.sendLeadEvent();
       }
 
-      window.location.href = '/confirm';
       return { success: true };
     } catch (err) {
       return {
@@ -416,8 +415,10 @@
       }
       return;
     }
+
     // Показываем успех
-    renderSuccess();
+    window.location.href = '/confirm';
+    // renderSuccess();
   }
 
   function renderSuccess() {
