@@ -129,6 +129,7 @@
         window.sendLeadEvent();
       }
 
+      window.location.href = '/confirm';
       return { success: true };
     } catch (err) {
       return {
