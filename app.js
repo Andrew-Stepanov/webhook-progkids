@@ -126,7 +126,9 @@ app.post("/webhook_v2", async (req, res) => {
       539861: "{facebookClientId}",
       540309: "{ip}",
       540311: "{country}",
-      540313: "{city}"
+      540313: "{city}",
+      540650: popupId === 'exit-popup' ? 1 : 0,
+      540652: req.body.popupIndex,
     }
   }, res);
 });

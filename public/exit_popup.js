@@ -60,6 +60,7 @@
     let idx = Math.min(exitIntentShownCount - 1, exitPopupTexts.length - 1);
     const dataToSend = {
       popupId: 'exit-popup',
+      popupIndex: idx + 1,
       phone: phone,
       name: name,
       email: email,
